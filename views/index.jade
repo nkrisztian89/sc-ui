@@ -1,0 +1,15 @@
+extends layouts/base
+block content
+  #content
+    .dialog
+      .box
+        h1 watch on youtube
+        a(href='https://www.youtube.com/watch?v=3mURrVKerHg')
+          img(src='/imgs/game/play.png')
+        div(id='dialog')
+
+  script(type='text/javascript', src='/build/pixi.js')
+  script(type='text/javascript', src='/build/xhr.js')
+  script(type='text/javascript', src='/build/socket.js')
+  script(type='text/javascript', src='/build/solar.lib.js')
+  script(type='text/javascript', src='/build/client.js')

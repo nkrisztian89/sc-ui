@@ -1,0 +1,288 @@
+* { margin: 0; padding: 0; }
+
+html { font-size: 62.5%; }
+
+html, body {
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  font-family: "Open Sans", sans-serif;
+  font-size: 1.8rem;
+  color: #666;
+  background: #000;
+}
+
+a { text-decoration: none; }
+
+a:link,
+a:visited,
+a:active { color: rgba(255, 255, 255, 0.8); }
+
+a:hover { color: #fff; }
+
+textarea, input { outline: none; }
+
+/*
+ * General Styles
+ */
+#content {
+  height: 100%;
+  width: 100%;
+  background: url('../imgs/game/solarcrusaders.jpg') center center no-repeat;
+}
+
+#content.error { background: none; }
+
+/*
+ * Login Styles
+ */
+.login {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  height: 0;
+  width: 0;
+}
+
+.login .box {
+  position: relative;
+  top: 0;
+  left: -310px;
+  width: 620px;
+  height: 70px;
+  text-align: center;
+  background: url('../imgs/game/login-bg.png') top center no-repeat;
+}
+
+.login .box .form {
+  height: 19px;
+  padding: 8px 0 0 118px;
+}
+
+.login .box .input {
+  float: left;
+  width: 100px;
+  margin: 0 6px;
+  padding: 2px;
+  background: #645d50;
+  border-top: solid 1px #3d3931;
+  border-right: solid 1px #3d3931;
+  border-bottom: solid 1px #7a7469;
+  border-left: solid 1px #7a7469;
+}
+
+.login .box .buttons {
+  float: left;
+}
+
+.login .box label {
+  display: block;
+  float: left;
+  padding: 2;
+  margin: 0;
+  color: #fff;
+  font-size: 10px;
+  line-height: 19px;
+  text-transform: uppercase;
+}
+
+.login .box input {
+  display: block;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  color: #fff;
+  border: none;
+  background: none;
+}
+
+.login .box button {
+  display: block;
+  height: 19px;
+  padding: 2px 4px;
+  margin: 0;
+  color: #fff;
+  font-size: 10px;
+  line-height: 13px;
+  text-transform: uppercase;
+  background: #645d50;
+  border-bottom: solid 1px #3d3931;
+  border-left: solid 1px #3d3931;
+  border-top: solid 1px #7a7469;
+  border-right: solid 1px #7a7469;
+}
+
+.login .register {
+  position: relative;
+  left: -164px;
+  top: -28px;
+  width: 328px;
+  height: 72px;
+  cursor: pointer;
+  background: url('../imgs/game/register-button.png') center top no-repeat;
+}
+
+/*
+ * Dialog Redirect
+ */
+.dialog {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: none;
+}
+
+.dialog .box {
+  position: relative;
+  left: -128px;
+  top: -64px;
+  width: 276px;
+  height: 128px;
+  text-transform: uppercase;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+}
+
+.dialog .box img {
+  position: absolute;
+  right: 15px;
+  top: 15px;
+}
+
+.dialog .box h1 {
+  color: #fff;
+  padding: 30px 15px 15px 15px;
+  font-size: 1.4rem;
+  font-weight: bold;
+}
+
+#dialog {
+  padding: 15px 15px 0 15px;
+  color: #aaa;
+  font-size: 1.2rem;
+}
+
+/*
+ * Display Flags
+ */
+#content.error .dialog { display: block; }
+
+/*
+ * Modal
+ */
+.modal {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.75);
+}
+
+.modal .box {
+  position: absolute;
+  width: 60%;
+  height: 70%;
+  top: 15%;
+  left: 20%;
+  overflow: auto;
+  background: rgba(0, 0, 0, 0.75);
+}
+
+.modal .box .completed,
+.modal .box .register {
+  margin: auto;
+  padding: 20px;
+}
+
+.modal .box .completed {
+  display: none;
+}
+
+.modal .box .splash {
+  position: relative;
+  width: 100%;
+  height: 350px;
+  background: url('../imgs/game/splash.jpg') center center no-repeat;
+  background-size: 100% auto;
+}
+
+.modal .box .input {
+  padding: 10px;
+  border: solid 1px rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.modal .box input {
+  width: 100%;
+  height: 20px;
+  margin: 0;
+  padding: 0;
+  color: #ccc;
+  font-size: 18px;
+  line-height: 20px;
+  background: none;
+  border: none;
+}
+
+.modal .box h1 {
+  margin: 0 0 5px 0;
+  color: #e4e4e4;
+  font-size: 21px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.modal .box h2 {
+  margin: 0 0 5px 0;
+  color: #88bbee;
+  font-size: 15px;
+  font-weight: normal;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.modal .box p {
+  margin: 10px 0 5px 0;
+  color: #999;
+  font-size: 14px;
+  text-transform: uppercase;
+}
+
+.modal .box button {
+  cursor: pointer;
+  margin: 0 10px 0 0;
+  padding: 10px;
+  color: #5588bb;
+  font-size: 14px;
+  text-transform: uppercase;
+  border: solid 1px rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.modal .box button:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.modal .box .buttons {
+  width: 100%;
+  padding: 20px 0;
+  background: rgba(0, 0, 0, 0.8);
+}
+
+.modal .box .error {
+  margin: 10px 0 5px 0;
+  color: #f00;
+}
+
+/*
+ * Mobile
+ */
+@media screen and (max-width: 500px) {
+  #content {
+    background-size: 94% auto;
+  }
+}
