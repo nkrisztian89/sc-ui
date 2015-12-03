@@ -35,17 +35,8 @@ SectorState.prototype.create = function() {
       mouse.capture = true;
       mouse.mouseWheelCallback = function(event) {
         var delta = event.deltaY / sensitivity,
-            scale = engine.Math.clamp(this.world.scale.x - delta, 0.5, 1.2),
-            gridLayer = global.state.gridLayer;
-
+            scale = engine.Math.clamp(this.world.scale.x - delta, 0.5, 1.2);
         this.world.scale.set(scale, scale);
-        
-        // show/hide sector grid
-        if(scale >= 1.0) {
-          gridLayer.visible = true;
-        } else {
-          gridLayer.visible = false;
-        }
       };
 
   // store gui reference
@@ -67,9 +58,6 @@ SectorState.prototype.create = function() {
     current: { x: 2048, y: 2048 },
     rotation: 0.0
   });
-
-  // create a ship
-  // this.ship = new solar.sector.Ship(this.shipManager, 'vessel-x04');
 
   // show gui
   this.gui && this.gui.toggle(true);
