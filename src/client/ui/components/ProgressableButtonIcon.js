@@ -45,7 +45,7 @@ function ProgressableButtonIcon(game, key, settings) {
 
   this.addView(this.progressBg);
   this.addView(this.progress);
-};
+}
 
 ProgressableButtonIcon.prototype = Object.create(ButtonIcon.prototype);
 ProgressableButtonIcon.prototype.constructor = ProgressableButtonIcon;

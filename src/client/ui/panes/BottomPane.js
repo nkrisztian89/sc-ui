@@ -55,7 +55,7 @@ function BottomPane(game, string, settings) {
   this.addView(this.bg);
   this.addPanel(Layout.CENTER, this.content);
 
-  this.iconWithBar1 = new ProgressableButtonIcon(game, 'icon1', {width:30, height:30}),
+  this.iconWithBar1 = new ProgressableButtonIcon(game, 'icon1', {width:30, height:30});
   this.iconWithBar1.on('inputUp', this._clicked1, this);
   this.content.addPanel(Layout.NONE, this.iconWithBar1);
   this.iconWithBar1.setProgressBar(0.3);
