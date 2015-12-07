@@ -75,8 +75,7 @@ GUIState.prototype.create = function() {
 
   this.topPanel = new Panel(game, new FlowLayout(Layout.CENTER, Layout.TOP, Layout.HORIZONTAL, 6));
   this.topPanel.addPanel(Layout.NONE, this.rightPane);
-  
-  
+
   this.bottomPanel = new Panel(game, new FlowLayout(Layout.CENTER, Layout.BOTTOM, Layout.HORIZONTAL, 6));
   this.bottomPanel.setPadding(6);
   this.bottomPanel.addPanel(Layout.BOTTOM, this.bottomPane = new BottomPane(game, name));
@@ -96,9 +95,9 @@ GUIState.prototype.create = function() {
   // this.centerPanel.addPanel(Layout.TOP, this.headerPane);
   this.centerPanel.addPanel(Layout.CENTER, this.shipPanel);
   this.centerPanel.addPanel(Layout.LEFT, this.leftPane);
-  this.centerPanel.addPanel(Layout.BOTTOM, this.bottomPanel);
   
   this.basePanel.addPanel(Layout.TOP, this.topPanel);
+  this.basePanel.addPanel(Layout.BOTTOM, this.bottomPanel);
 
   this.root.addPanel(Layout.STRETCH, this.selection);
   this.root.addPanel(Layout.STRETCH, this.basePanel);
