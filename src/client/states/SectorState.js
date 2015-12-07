@@ -18,11 +18,9 @@ SectorState.prototype.init = function(args) {
 };
 
 SectorState.prototype.preload = function() {
-  this.game.load.image('vessel-x01', 'imgs/game/ships/vessel-x01.png');
-  this.game.load.image('engine-glow', 'imgs/game/fx/engine-glow.png');
   this.game.load.image('laser-a', 'imgs/game/turrets/laser-a.png');
-  this.game.load.image('vessel-x01-shields', 'imgs/game/ships/vessel-x01-shields.jpg');
   this.game.load.json('ship-configuration', 'data/ship-configuration.json');
+  this.game.load.atlasJSONHash('ship-atlas', 'imgs/game/ships/ship-atlas.png', 'data/ship-atlas.json');
 };
 
 // loadUpdate = function() {};
@@ -50,13 +48,16 @@ SectorState.prototype.create = function() {
 
   // create ship manager
   this.shipManager = new solar.sector.ShipManager(this.game);
-  this.shipManager.createShip({
+  this.shipManager.create({
+    // updated from sync
     uuid: '1',
-    username: 'neutrino',
-    chasis: 'vessel-x01',
     throttle: 1.0,
     current: { x: 2048, y: 2048 },
     rotation: 0.0
+  }, {
+    // held in cache
+    username: 'neutrino',
+    chasis: 'vessel-x01',
   });
 
   // show gui
