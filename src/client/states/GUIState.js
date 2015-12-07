@@ -67,7 +67,7 @@ GUIState.prototype.create = function() {
       
   this.leftPane = new LeftPane(game);
   this.rightPane = new RightPane(game);
-  this.headerPane = new HeaderPane(game);
+  // this.headerPane = new HeaderPane(game);
 
   this.shipPanel = new Panel(game, new FlowLayout(Layout.LEFT, Layout.TOP, Layout.VERTICAL, 6));
   this.shipPanel.setPadding(6);
