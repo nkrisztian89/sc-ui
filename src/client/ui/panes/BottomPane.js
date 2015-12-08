@@ -7,6 +7,7 @@ var engine = require('engine'),
     BorderLayout = require('../layouts/BorderLayout'),
     BackgroundView = require('../views/BackgroundView'),
     ProgressableButtonIcon = require('../components/ProgressableButtonIcon'),
+    ToolTip = require('../components/ToolTip'),
     Class = engine.Class;
 
 function BottomPane(game, string, settings) {
@@ -45,7 +46,7 @@ function BottomPane(game, string, settings) {
     this.setPreferredSize(
       this.settings.width, this.settings.height);
   }
-  
+
   this.setPadding.apply(this, this.settings.padding);
   this.setBorder.apply(this, this.settings.border);
 
@@ -60,8 +61,10 @@ function BottomPane(game, string, settings) {
   this.content.addPanel(Layout.NONE, this.iconWithBar1);
   this.iconWithBar1.setProgressBar(0.3);
 
+  this.toolTip = new ToolTip(game, {width:80, height:30});
+  this.content.addPanel(Layout.NONE, this.toolTip);
 
-};
+}
 
 BottomPane.prototype = Object.create(Panel.prototype);
 BottomPane.prototype.constructor = BottomPane;
@@ -72,6 +75,6 @@ BottomPane.prototype.addContent = function(constraint, panel) {
 
 BottomPane.prototype._clicked1 = function() {
   this.iconWithBar1.setProgressBar( this.iconWithBar1.percentage / 100 + 0.2);
-}
+};
 
 module.exports = BottomPane;

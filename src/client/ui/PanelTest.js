@@ -2,7 +2,7 @@
 var engine = require('engine'),
     StackLayout = require('./layouts/StackLayout');
 
-function Panel(game, layout, constraint) {
+function PanelTest(game, layout, constraint) {
   engine.Group.call(this, game);
 
   this.layout = layout || new StackLayout();
@@ -12,8 +12,8 @@ function Panel(game, layout, constraint) {
   this.psWidth = this.psHeight = this.cachedWidth = -1;
 
   this.size = { width: 0, height: 0 };
-  this.border = new engine.Rectangle();
-  this.padding = new engine.Rectangle();
+  this.border = new engine.Circle(0,0,100);
+  this.padding = new engine.Circle(0,0,100);
 
   this.views = [];
   this.panels = [];
@@ -22,11 +22,11 @@ function Panel(game, layout, constraint) {
   this.isLayoutValid = false;
 }
 
-Panel.prototype = Object.create(engine.Group.prototype);
-Panel.prototype.constructor = Panel;
+PanelTest.prototype = Object.create(engine.Group.prototype);
+PanelTest.prototype.constructor = PanelTest;
 
-Panel.prototype.addPanel = function(constraint, panel) {
-  if(panel.constraint != null) {
+PanelTest.prototype.addPanel = function(constraint, panel) {
+  if(panel.constraint !== null) {
     constr = panel.constraint;
   } else {
     panel.constraint = constraint;
@@ -37,19 +37,19 @@ Panel.prototype.addPanel = function(constraint, panel) {
   this.invalidate();
 };
 
-Panel.prototype.removePanel = function(panel) {
+PanelTest.prototype.removePanel = function(panel) {
   this.panels.splice(this.panels.indexOf(panel), 1);
   this.removeChild(panel);
   this.invalidate();
-}
+};
 
-Panel.prototype.addView = function(view) {
+PanelTest.prototype.addView = function(view) {
   this.views.push(view);
   this.addChild(view);
   this.invalidate();
-}
+};
 
-Panel.prototype.invalidate = function() {
+PanelTest.prototype.invalidate = function() {
   this.isValid = false;
   this.isLayoutValid = false;
   this.cachedWidth = -1;
@@ -62,7 +62,7 @@ Panel.prototype.invalidate = function() {
   }
 };
 
-Panel.prototype.validate = function() {
+PanelTest.prototype.validate = function() {
   this.validateMetric();
 
   if(this.size.width > 0 && this.size.height > 0 &&
@@ -79,7 +79,7 @@ Panel.prototype.validate = function() {
   }
 };
 
-Panel.prototype.validateMetric = function() {
+PanelTest.prototype.validateMetric = function() {
   if(this.isValid === false) {
     if(this.recalc) {
       this.recalc();
@@ -88,7 +88,7 @@ Panel.prototype.validateMetric = function() {
   }
 };
 
-Panel.prototype.repaint = function() {
+PanelTest.prototype.repaint = function() {
   if(this.visible === true) {
     for(var i=0; i<this.panels.length; i++) {
       this.panels[i].repaint();
@@ -97,17 +97,17 @@ Panel.prototype.repaint = function() {
   this.paint();
 };
 
-Panel.prototype.paint = function() {
+PanelTest.prototype.paint = function() {
   for(var i=0; i<this.views.length; i++) {
     this.views[i].paint(this.top, this.left, this.bottom, this.right);
   }
 };
 
-Panel.prototype.resize = function(width, height) {
+PanelTest.prototype.resize = function(width, height) {
   //.. resize
 };
 
-Panel.prototype.setBorder = function(top, left, bottom, right) {
+PanelTest.prototype.setBorder = function(top, left, bottom, right) {
   if(arguments.length == 1) {
     left = bottom = right = top;
   }
@@ -134,7 +134,7 @@ Panel.prototype.setBorder = function(top, left, bottom, right) {
   return this;
 };
 
-Panel.prototype.setPadding = function(top, left, bottom, right) {
+PanelTest.prototype.setPadding = function(top, left, bottom, right) {
   if(arguments.length == 1) {
     left = bottom = right = top;
   }
@@ -159,9 +159,9 @@ Panel.prototype.setPadding = function(top, left, bottom, right) {
   }
 
   return this;
-}
+};
 
-Panel.prototype.setSize = function(width, height) {
+PanelTest.prototype.setSize = function(width, height) {
   if(width != this.size.width || height != this.size.height) {
     this.size.width = width;
     this.size.height = height;
@@ -172,18 +172,18 @@ Panel.prototype.setSize = function(width, height) {
   return this;
 };
 
-Panel.prototype.setLocation = function(xx, yy) {
+PanelTest.prototype.setLocation = function(xx, yy) {
   if(xx != this.x || this.y != yy) {
     this.position.x = xx;
     this.position.y = yy;
 
-    if(this.relocated != null) {
-      this.relocated(xx, yy);
-    }
+   // if(this.relocated !== null) {
+   //   this.relocated(xx, yy);
+   // }
   }
 };
 
-Panel.prototype.setPreferredSize = function(width, height) {
+PanelTest.prototype.setPreferredSize = function(width, height) {
   if(width != this.psWidth || height != this.psHeight) {
     this.psWidth = width;
     this.psHeight = height;
@@ -191,7 +191,7 @@ Panel.prototype.setPreferredSize = function(width, height) {
   }
 };
 
-Panel.prototype.getPreferredSize = function() {
+PanelTest.prototype.getPreferredSize = function() {
   this.validateMetric();
 
   if(this.cachedWidth < 0) {
@@ -212,28 +212,28 @@ Panel.prototype.getPreferredSize = function() {
   };
 };
 
-Object.defineProperty(Panel.prototype, 'top', {
+Object.defineProperty(PanelTest.prototype, 'top', {
   get: function() {
     return this.padding.top + this.border.top;
   }
 });
 
-Object.defineProperty(Panel.prototype, 'left', {
+Object.defineProperty(PanelTest.prototype, 'left', {
   get: function() {
     return this.padding.left + this.border.left;
   }
 });
 
-Object.defineProperty(Panel.prototype, 'bottom', {
+Object.defineProperty(PanelTest.prototype, 'bottom', {
   get: function() {
     return this.padding.bottom + this.border.bottom;
   }
 });
 
-Object.defineProperty(Panel.prototype, 'right', {
+Object.defineProperty(PanelTest.prototype, 'right', {
   get: function() {
     return this.padding.right + this.border.right;
   }
 });
 
-module.exports = Panel;
+module.exports = PanelTest;
