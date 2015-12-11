@@ -20,6 +20,8 @@ function Panel(game, layout, constraint) {
 
   this.isValid = false;
   this.isLayoutValid = false;
+
+  this.toolTip = null;
 }
 
 Panel.prototype = Object.create(engine.Group.prototype);
@@ -42,6 +44,18 @@ Panel.prototype.removePanel = function(panel) {
   this.removeChild(panel);
   this.invalidate();
 }
+
+Panel.prototype.addToolTip = function(constraint, toolTip) {
+  if(toolTip.constraint != null) {
+    constr = toolTip.constraint;
+  } else {
+    toolTip.constraint = constraint;
+  }
+
+//  this.panels.push(panel);
+  this.addChild(toolTip);
+  this.invalidate();
+};
 
 Panel.prototype.addView = function(view) {
   this.views.push(view);

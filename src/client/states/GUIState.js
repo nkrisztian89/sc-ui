@@ -13,7 +13,9 @@ var engine = require('engine'),
     RightPane = require('../ui/panes/RightPane'),
     ShipPane = require('../ui/panes/ShipPane'),
     BottomPane = require('../ui/panes/BottomPane'),
+    Pane = require('../ui/components/Pane'),
       
+    ToolTip = require('../ui/components/ToolTip'),
     Alert = require('../ui/components/Alert'),
     AlertMessage = require('../ui/components/AlertMessage'),
     Modal = require('../ui/components/Modal'),
@@ -69,6 +71,7 @@ GUIState.prototype.create = function() {
   this.rightPane = new RightPane(game);
   // this.headerPane = new HeaderPane(game);
 
+
   this.shipPanel = new Panel(game, new FlowLayout(Layout.LEFT, Layout.TOP, Layout.VERTICAL, 6));
   this.shipPanel.setPadding(6);
   this.shipPanel.addPanel(Layout.LEFT, this.shipPane = new ShipPane(game, name));
@@ -84,6 +87,8 @@ GUIState.prototype.create = function() {
 
   this.modalComponent = new Modal(game);
   this.modalComponent.visible = false;
+
+  //this.toolTip = new ToolTip(game);
 
   this.alertComponent = new Alert(game);
   this.alertMessageComponent = new AlertMessage(game);
@@ -104,8 +109,23 @@ GUIState.prototype.create = function() {
   this.root.addPanel(Layout.STRETCH, this.centerPanel);
   this.root.addPanel(Layout.STRETCH, this.modalComponent);
 
+  this.root1 = new Panel(game, new FlowLayout(Layout.LEFT, Layout.TOP, Layout.VERTICAL, 6));
+
+  this.root1.setSize(game.width, game.height);
+
+  this.toolTip1 = new ToolTip(game,"top content", {position:Layout.TOP});
+  this.root1.addPanel(Layout.STRETCH, this.toolTip1);
+  this.toolTip2 = new ToolTip(game,"bottom content", {position:Layout.BOTTOM});
+  this.root1.addPanel(Layout.STRETCH, this.toolTip2);
+  this.toolTip3 = new ToolTip(game,"left content", {position:Layout.LEFT});
+  this.root1.addPanel(Layout.STRETCH, this.toolTip3);
+  this.toolTip4 = new ToolTip(game,"right content", {position:Layout.RIGHT});
+  this.root1.addPanel(Layout.STRETCH, this.toolTip4);
+
+
   // add root to stage
   this.game.stage.addChild(this.root);
+this.game.stage.addChild(this.root1);
 
   // login
   this.login();
@@ -144,6 +164,13 @@ GUIState.prototype.toggle = function(force) {
   if(this.root.visible) {
     this.root.invalidate();
   }
+    this.root1.visible = force !== undefined ? force : !this.root1.visible;
+  
+  // repaint gui
+  if(this.root1.visible) {
+    this.root1.invalidate();
+  }
+
 };
 
 GUIState.prototype.modal = function(show, content, lock, visible) {
@@ -172,6 +199,10 @@ GUIState.prototype.resize = function(width, height) {
   if(this.root !== undefined) {
     this.root.setSize(width, height);
     this.root.invalidate();
+  }
+    if(this.root1 !== undefined) {
+    this.root1setSize(width, height);
+    this.root1.invalidate();
   }
 };
 

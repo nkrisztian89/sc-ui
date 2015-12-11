@@ -61,8 +61,6 @@ function BottomPane(game, string, settings) {
   this.content.addPanel(Layout.NONE, this.iconWithBar1);
   this.iconWithBar1.setProgressBar(0.3);
 
-  this.toolTip = new ToolTip(game, {width:80, height:30});
-  this.content.addPanel(Layout.NONE, this.toolTip);
 
 }
 
