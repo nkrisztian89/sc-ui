@@ -161,31 +161,43 @@ ToolTip.prototype.constructor = ToolTip;
 
 ToolTip.prototype.resize = function(width, height) {
   this.arrowGraphics.beginFill(0x0000);
-  this.arrowGraphics.lineStyle(10, 0x3868b8);
   switch (this.toolTipPosition) {
     case Layout.LEFT:
-      this.arrowGraphics.moveTo(0, 0);
-      this.arrowGraphics.lineTo(this.arrow.psWidth, height / 2);
-      this.arrowGraphics.lineTo(0, height);
-       this.arrowGraphics.moveTo(0, 0);
+      this.arrowGraphics.lineStyle(0, 0x3868b8);
+      this.arrowGraphics.moveTo(-2, 0);
+      this.arrowGraphics.lineTo(this.arrow.psWidth -2, height / 2);
+      this.arrowGraphics.lineTo(-2, height);
+      this.arrowGraphics.endFill();
+      this.arrowGraphics.beginFill(0x0000);
+      this.arrowGraphics.lineStyle(1, 0x3868b8);
+      this.arrowGraphics.moveTo(-2, 0);
+      this.arrowGraphics.lineTo(this.arrow.psWidth -2, height / 2);
+      this.arrowGraphics.lineTo(-2, height);
+      this.arrowGraphics.lineTo(this.arrow.psWidth -2, height / 2);
      break;
     case Layout.RIGHT:
-      this.arrowGraphics.moveTo(this.arrow.psWidth + 10, 0);
+      this.arrowGraphics.lineStyle(1, 0x3868b8);
+      this.arrowGraphics.moveTo(this.arrow.psWidth + 2, 0);
       this.arrowGraphics.lineTo(0, height / 2);
-      this.arrowGraphics.lineTo(this.arrow.psWidth + 10, height);
-      this.arrowGraphics.moveTo(this.arrow.psWidth + 10, 0);
+      this.arrowGraphics.lineTo(this.arrow.psWidth + 2, height);
       break;
     case Layout.TOP:
+      this.arrowGraphics.lineStyle(0, 0x3868b8);
+      this.arrowGraphics.moveTo(0, -2);
+      this.arrowGraphics.lineTo(width / 2, this.arrow.psHeight - 2);
+      this.arrowGraphics.lineTo(width, -2);
+      this.arrowGraphics.endFill();
+      this.arrowGraphics.lineStyle(1, 0x3868b8);
       this.arrowGraphics.moveTo(0, 0);
-      this.arrowGraphics.lineTo(width / 2, this.arrow.psHeight + 10);
+      this.arrowGraphics.lineTo(width / 2, this.arrow.psHeight - 2);
       this.arrowGraphics.lineTo(width, 0);
-      this.arrowGraphics.moveTo(0, 0);
+      this.arrowGraphics.lineTo(width / 2, this.arrow.psHeight - 2);
       break;
     case Layout.BOTTOM:
-      this.arrowGraphics.moveTo(0, this.arrow.psHeight + 10);
+      this.arrowGraphics.lineStyle(1, 0x3868b8);
+      this.arrowGraphics.moveTo(0, this.arrow.psHeight + 1);
       this.arrowGraphics.lineTo(width / 2, 0);
-      this.arrowGraphics.lineTo(width, this.arrow.psHeight + 10);
-      this.arrowGraphics.moveTo(0, this.arrow.psHeight + 10);
+      this.arrowGraphics.lineTo(width, this.arrow.psHeight + 1);
       break;
   }
   this.arrowGraphics.endFill();
