@@ -25,7 +25,7 @@ function Tilemap(game, key, layers, settings) {
   this.tilemap = new engine.Tilemap(game, key);
 
   this.addView(this.bg);
-  
+
   for(var l in layers) {
     this.sprites.push(new TilemapSprite(
       game, this.tilemap,
@@ -33,7 +33,7 @@ function Tilemap(game, key, layers, settings) {
         this.tilemap.widthInPixels,
         this.tilemap.heightInPixels
     ));
-    
+
     this.tilemap.addTilesetImage(layers[l]);
 
     this.addView(this.sprites[l]);

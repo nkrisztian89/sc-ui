@@ -11,24 +11,24 @@ var engine = require('engine'),
     BackgroundView = require('../views/BackgroundView'),
     Class = engine.Class;
 
-function ToolTip(game, text, settings) {
+function ToolTip(game, settings) {
   settings = settings || {};
   this.toolTipPosition = settings.position || Layout.RIGHT;
   var padding = [0];
   var direction = Layout.HORIZONTAL;
   switch (this.toolTipPosition) {
     case Layout.RIGHT:
-      padding = [1, 0, 1, 1];
+      padding = [4, 0, 1, 1];
       break;
     case Layout.LEFT:
-      padding = [1, 1, 1, 0];
+      padding = [1, 4, 1, 0];
       break;
     case Layout.TOP:
       direction = Layout.VERTICAL;
-      padding = [1, 1, 0, 1];
+      padding = [4, 1, 0, 1];
       break;
     case Layout.BOTTOM:
-      padding = [0, 1, 1, 1];
+      padding = [0, 4, 1, 1];
       direction = Layout.VERTICAL;
       break;
   }
@@ -56,34 +56,7 @@ function ToolTip(game, text, settings) {
         blendMode: engine.BlendMode.NORMAL
       },
       layout: {
-        direction: Layout.VERTICAL
-      }
-    },    
-    title: {
-      padding: [4],
-      border: [0],
-      text: {
-        tint: 0xFF3366,
-        fontName: 'medium'
-      },
-      bg: {
-        color: 0x000000,
-        fillAlpha: 1.0,
-        borderSize: 0
-      }
-    },
-    message: {
-      padding: [12, 4, 12, 4],
-      border: [0],
-      text: {
-        fontName: 'medium',
-        characterSpacing: 1,
-        lineSpacing: 4
-      },
-      bg: {
-        color: 0x000000,
-        fillAlpha: 1.0,
-        borderSize: 0
+        direction: Layout.HORIZONTAL
       }
     }
   });
@@ -93,7 +66,7 @@ function ToolTip(game, text, settings) {
     this.setPreferredSize(
       this.settings.width, this.settings.height);
   }
-  
+
   this.setPadding.apply(this, this.settings.padding);
   this.setBorder.apply(this, this.settings.border);
 
@@ -110,19 +83,12 @@ function ToolTip(game, text, settings) {
   }
   if ((this.toolTipPosition === Layout.LEFT) || (this.toolTipPosition === Layout.RIGHT)) {
     bgSettings.width = 30;
-  }  
+  }
   this.arrow = new Pane(game, bgSettings);
   this.content = new Pane(game, this.settings.content);
 
-//  this.bg = new BackgroundView(game, this.settings.bg);
-  this.title = new Label(game, 'ToolTip', this.settings.title);
-  this.message = new Label(game, '', this.settings.message);
-
-  this.content.addPanel(Layout.STRETCH, this.title);
-  this.content.addPanel(Layout.USE_PS_SIZE, this.message);
- 
  this.contentAsBorder.addPanel(Layout.STRETCH, this.content);
- 
+
    switch (this.toolTipPosition) {
     case Layout.RIGHT:
       this.addPanel(Layout.STRETCH, this.arrow);
@@ -141,14 +107,7 @@ function ToolTip(game, text, settings) {
       this.addPanel(Layout.STRETCH, this.contentAsBorder);
       break;
   }
-
-  this.title.text =  'ToolTip';
-  this.message.text = text;
-
-
   this.arrowGraphics = new engine.Graphics();
-  
-  // add it the stage so we see it on our screens..
   this.arrow.addChild(this.arrowGraphics);
 
 
@@ -161,50 +120,52 @@ ToolTip.prototype.constructor = ToolTip;
 
 ToolTip.prototype.resize = function(width, height) {
   this.arrowGraphics.beginFill(0x0000);
+  var borderOverlap = 2;
   switch (this.toolTipPosition) {
     case Layout.LEFT:
       this.arrowGraphics.lineStyle(0, 0x3868b8);
-      this.arrowGraphics.moveTo(-2, 0);
-      this.arrowGraphics.lineTo(this.arrow.psWidth -2, height / 2);
-      this.arrowGraphics.lineTo(-2, height);
+      this.arrowGraphics.moveTo(-3 * borderOverlap, 0);
+      this.arrowGraphics.lineTo(this.arrow.psWidth - 3 * borderOverlap, height / 2);
+      this.arrowGraphics.lineTo(-3 * borderOverlap, height);
       this.arrowGraphics.endFill();
       this.arrowGraphics.beginFill(0x0000);
       this.arrowGraphics.lineStyle(1, 0x3868b8);
-      this.arrowGraphics.moveTo(-2, 0);
-      this.arrowGraphics.lineTo(this.arrow.psWidth -2, height / 2);
-      this.arrowGraphics.lineTo(-2, height);
-      this.arrowGraphics.lineTo(this.arrow.psWidth -2, height / 2);
+      this.arrowGraphics.moveTo(-3 * borderOverlap, 0);
+      this.arrowGraphics.lineTo(this.arrow.psWidth - 3 * borderOverlap, height / 2);
+      this.arrowGraphics.lineTo(-3 * borderOverlap, height);
+      this.arrowGraphics.lineTo(this.arrow.psWidth - 3 * borderOverlap, height / 2);
      break;
     case Layout.RIGHT:
       this.arrowGraphics.lineStyle(1, 0x3868b8);
-      this.arrowGraphics.moveTo(this.arrow.psWidth + 2, 0);
+      this.arrowGraphics.moveTo(this.arrow.psWidth + borderOverlap, 0);
       this.arrowGraphics.lineTo(0, height / 2);
-      this.arrowGraphics.lineTo(this.arrow.psWidth + 2, height);
+      this.arrowGraphics.lineTo(this.arrow.psWidth + borderOverlap, height);
       break;
     case Layout.TOP:
       this.arrowGraphics.lineStyle(0, 0x3868b8);
-      this.arrowGraphics.moveTo(0, -2);
-      this.arrowGraphics.lineTo(width / 2, this.arrow.psHeight - 2);
-      this.arrowGraphics.lineTo(width, -2);
+      this.arrowGraphics.moveTo(0, -2 * borderOverlap);
+      this.arrowGraphics.lineTo(width / 2, this.arrow.psHeight - 2 * borderOverlap);
+      this.arrowGraphics.lineTo(width, -2 * borderOverlap);
       this.arrowGraphics.endFill();
       this.arrowGraphics.lineStyle(1, 0x3868b8);
-      this.arrowGraphics.moveTo(0, 0);
-      this.arrowGraphics.lineTo(width / 2, this.arrow.psHeight - 2);
-      this.arrowGraphics.lineTo(width, 0);
-      this.arrowGraphics.lineTo(width / 2, this.arrow.psHeight - 2);
+      this.arrowGraphics.moveTo(0, -2 * borderOverlap);
+      this.arrowGraphics.lineTo(width / 2, this.arrow.psHeight - 2 * borderOverlap);
+      this.arrowGraphics.lineTo(width, -2 * borderOverlap);
+      this.arrowGraphics.lineTo(width / 2, this.arrow.psHeight - 2 * borderOverlap);
       break;
     case Layout.BOTTOM:
       this.arrowGraphics.lineStyle(1, 0x3868b8);
-      this.arrowGraphics.moveTo(0, this.arrow.psHeight + 1);
+      this.arrowGraphics.moveTo(0, this.arrow.psHeight + borderOverlap);
       this.arrowGraphics.lineTo(width / 2, 0);
-      this.arrowGraphics.lineTo(width, this.arrow.psHeight + 1);
+      this.arrowGraphics.lineTo(width, this.arrow.psHeight + borderOverlap);
       break;
   }
   this.arrowGraphics.endFill();
 };
 
-ToolTip.prototype._close = function() {
-  this.game.emit('gui/modal', false);
+ToolTip.prototype.addContent = function(constraint, panel) {
+  this.content.addPanel(constraint, panel);
+  this.invalidate();
 };
 
 module.exports = ToolTip;

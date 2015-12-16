@@ -1,21 +1,23 @@
 
 var engine = require('engine'),
-    
+
     Panel = require('../ui/Panel'),
     Layout = require('../ui/Layout'),
 
     BorderLayout = require('../ui/layouts/BorderLayout'),
     FlowLayout = require('../ui/layouts/FlowLayout'),
     StackLayout = require('../ui/layouts/StackLayout'),
-    
+
     HeaderPane = require('../ui/panes/HeaderPane'),
     LeftPane = require('../ui/panes/LeftPane'),
     RightPane = require('../ui/panes/RightPane'),
     ShipPane = require('../ui/panes/ShipPane'),
     BottomPane = require('../ui/panes/BottomPane'),
     Pane = require('../ui/components/Pane'),
-      
+
     ToolTip = require('../ui/components/ToolTip'),
+    Label = require('../ui/components/Label'),
+    ButtonIcon = require('../ui/components/ButtonIcon'),
     Alert = require('../ui/components/Alert'),
     AlertMessage = require('../ui/components/AlertMessage'),
     Modal = require('../ui/components/Modal'),
@@ -49,7 +51,7 @@ GUIState.prototype.preload = function() {
   this.game.load.image('deck', 'imgs/game/tilesets/deck-mini.png');
   this.game.load.image('wall', 'imgs/game/tilesets/wall-mini.png');
   this.game.load.image('grid', 'imgs/game/tilesets/grid-mini.png');
-  
+
   this.game.load.tilemap('ship', 'data/ship-mini.json');
 
   // spritesheet
@@ -66,7 +68,7 @@ GUIState.prototype.create = function() {
 
   this.basePanel = new Panel(game, new BorderLayout(0, 0));
   this.centerPanel = new Panel(game, new BorderLayout(0, 0));
-      
+
   this.leftPane = new LeftPane(game);
   this.rightPane = new RightPane(game);
   // this.headerPane = new HeaderPane(game);
@@ -98,9 +100,9 @@ GUIState.prototype.create = function() {
   this.root.visible = false;
 
   // this.centerPanel.addPanel(Layout.TOP, this.headerPane);
-  this.centerPanel.addPanel(Layout.CENTER, this.shipPanel);
+  //this.centerPanel.addPanel(Layout.CENTER, this.shipPanel);
   this.centerPanel.addPanel(Layout.LEFT, this.leftPane);
-  
+
   this.basePanel.addPanel(Layout.TOP, this.topPanel);
   this.basePanel.addPanel(Layout.BOTTOM, this.bottomPanel);
 
@@ -113,15 +115,74 @@ GUIState.prototype.create = function() {
 
   this.root1.setSize(game.width, game.height);
 
-  this.toolTip1 = new ToolTip(game,"top content", {position:Layout.TOP});
+  this.toolTip1 = new ToolTip(game);
+
+  var text = new Label(game, 'Lorem Ipsum is simply dummy text of the\nprinting and typesetting industry. Lorem Ipsum has \nbeen the industry\'s standard dummy text ', {
+    bg: {
+      fillAlpha: 0.0,
+      borderSize: 0.0
+    },
+    text: { fontName: 'small' }
+  });
+
+  this.icon1 = new ButtonIcon(game, 'icon1'),
+  this.toolTip1.addContent(Layout.LEFT, this.icon1);
+  this.toolTip1.addContent(Layout.LEFT, text);
+
   this.root1.addPanel(Layout.STRETCH, this.toolTip1);
-  this.toolTip2 = new ToolTip(game,"bottom content", {position:Layout.BOTTOM});
+
+  this.toolTip2 = new ToolTip(game, {position:Layout.BOTTOM});
+  var text2 = new Label(game, 'Lorem Ipsum is simply dummy text of the\nprinting and typesetting industry. Lorem Ipsum has \nbeen the industry\'s standard dummy text ', {
+    bg: {
+      fillAlpha: 0.0,
+      borderSize: 0.0
+    },
+    text: { fontName: 'small' }
+  });
+
+  var icon2 = new ButtonIcon(game, 'icon1');
+  this.toolTip2.addContent(Layout.LEFT, text2);
+  this.toolTip2.addContent(Layout.LEFT, icon2);
   this.root1.addPanel(Layout.STRETCH, this.toolTip2);
+
+  this.toolTip3 = new ToolTip(game, {position:Layout.LEFT});
+
+  var text3 = new Label(game, 'Big Res Text', {
+    bg: {
+      fillAlpha: 0.0,
+      borderSize: 0.0
+    },
+    text: {
+        tint: 0xFF3366
+    }
+  });
+
+  this.toolTip3.addContent(Layout.LEFT, text3);
+
+  this.root1.addPanel(Layout.STRETCH, this.toolTip3);
+
+  this.toolTip4 = new ToolTip(game, {position:Layout.TOP});
+
+  var text4 = new Label(game, 'Top position', {
+    bg: {
+      fillAlpha: 0.0,
+      borderSize: 0.0
+    }
+  });
+
+  this.toolTip4.addContent(Layout.LEFT, text4);
+
+  this.root1.addPanel(Layout.STRETCH, this.toolTip4);
+
+
+
+
+/*
   this.toolTip3 = new ToolTip(game,"left content", {position:Layout.LEFT});
   this.root1.addPanel(Layout.STRETCH, this.toolTip3);
   this.toolTip4 = new ToolTip(game,"right content", {position:Layout.RIGHT});
   this.root1.addPanel(Layout.STRETCH, this.toolTip4);
-
+*/
 
   // add root to stage
   this.game.stage.addChild(this.root);
@@ -159,13 +220,13 @@ GUIState.prototype.refresh = function() {
 
 GUIState.prototype.toggle = function(force) {
   this.root.visible = force !== undefined ? force : !this.root.visible;
-  
+
   // repaint gui
   if(this.root.visible) {
     this.root.invalidate();
   }
     this.root1.visible = force !== undefined ? force : !this.root1.visible;
-  
+
   // repaint gui
   if(this.root1.visible) {
     this.root1.invalidate();
