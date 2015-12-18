@@ -1,16 +1,24 @@
-
 var engine = require('engine'),
     Layout = require('../Layout'),
     Panel = require('../Panel'),
-    Pane = require('../components/Pane'),
-    Label = require('../components/Label'),
-    Button = require('../components/Button'),
-    BorderLayout = require('../layouts/BorderLayout'),
-    FlowLayout = require('../layouts/FlowLayout'),
-    StackLayout = require('../layouts/StackLayout'),
-    BackgroundView = require('../views/BackgroundView'),
-    Class = engine.Class;
+    Pane = require('../components/Pane');
 
+/**
+ * Class ToolTip UI component.
+ * @example <caption>Example usage of ToolTip.</caption>
+ * this.toolTip2 = new ToolTip(game, {position:Layout.BOTTOM});
+ * var text2 = new Label(game, 'Lorem Ipsum is simply dummy text of the\nprinting and typesetting industry. Lorem Ipsum has \nbeen the industry\'s standard dummy text ', {
+ *   bg: {
+ *     fillAlpha: 0.0,
+ *     borderSize: 0.0
+ *   },
+ *   text: { fontName: 'small' }
+ * });
+ *
+ *  var icon2 = new ButtonIcon(game, 'icon1');
+ * this.toolTip2.addContent(Layout.LEFT, text2);
+ * this.toolTip2.addContent(Layout.LEFT, icon2);
+ */
 function ToolTip(game, settings) {
   settings = settings || {};
   this.toolTipPosition = settings.position || Layout.RIGHT;
@@ -47,7 +55,7 @@ function ToolTip(game, settings) {
       radius: 0.0
     },
     content: {
-      padding: [0,0],
+      padding: [4, 4],
       bg: {
         fillAlpha: 1,
         color: 0x0000,
@@ -86,8 +94,7 @@ function ToolTip(game, settings) {
   }
   this.arrow = new Pane(game, bgSettings);
   this.content = new Pane(game, this.settings.content);
-
- this.contentAsBorder.addPanel(Layout.STRETCH, this.content);
+  this.contentAsBorder.addPanel(Layout.STRETCH, this.content);
 
    switch (this.toolTipPosition) {
     case Layout.RIGHT:
@@ -110,9 +117,8 @@ function ToolTip(game, settings) {
   this.arrowGraphics = new engine.Graphics();
   this.arrow.addChild(this.arrowGraphics);
 
-
   this.game.emit('gui/modal', true, this, true);
-};
+}
 
 
 ToolTip.prototype = Object.create(Pane.prototype);
@@ -120,44 +126,43 @@ ToolTip.prototype.constructor = ToolTip;
 
 ToolTip.prototype.resize = function(width, height) {
   this.arrowGraphics.beginFill(0x0000);
-  var borderOverlap = 2;
   switch (this.toolTipPosition) {
     case Layout.LEFT:
       this.arrowGraphics.lineStyle(0, 0x3868b8);
-      this.arrowGraphics.moveTo(-3 * borderOverlap, 0);
-      this.arrowGraphics.lineTo(this.arrow.psWidth - 3 * borderOverlap, height / 2);
-      this.arrowGraphics.lineTo(-3 * borderOverlap, height);
+      this.arrowGraphics.moveTo(- this.settings.bg.padding[1], 0);
+      this.arrowGraphics.lineTo(this.arrow.psWidth - this.settings.bg.padding[1], height / 2);
+      this.arrowGraphics.lineTo(- this.settings.bg.padding[1], height);
       this.arrowGraphics.endFill();
       this.arrowGraphics.beginFill(0x0000);
       this.arrowGraphics.lineStyle(1, 0x3868b8);
-      this.arrowGraphics.moveTo(-3 * borderOverlap, 0);
-      this.arrowGraphics.lineTo(this.arrow.psWidth - 3 * borderOverlap, height / 2);
-      this.arrowGraphics.lineTo(-3 * borderOverlap, height);
-      this.arrowGraphics.lineTo(this.arrow.psWidth - 3 * borderOverlap, height / 2);
+      this.arrowGraphics.moveTo(- this.settings.bg.padding[1], 0);
+      this.arrowGraphics.lineTo(this.arrow.psWidth - this.settings.bg.padding[1], height / 2);
+      this.arrowGraphics.lineTo(- this.settings.bg.padding[1], height);
+      this.arrowGraphics.lineTo(this.arrow.psWidth - this.settings.bg.padding[1], height / 2);
      break;
     case Layout.RIGHT:
       this.arrowGraphics.lineStyle(1, 0x3868b8);
-      this.arrowGraphics.moveTo(this.arrow.psWidth + borderOverlap, 0);
+      this.arrowGraphics.moveTo(this.arrow.psWidth +  this.settings.bg.padding[3], 0);
       this.arrowGraphics.lineTo(0, height / 2);
-      this.arrowGraphics.lineTo(this.arrow.psWidth + borderOverlap, height);
+      this.arrowGraphics.lineTo(this.arrow.psWidth +  this.settings.bg.padding[3], height);
       break;
     case Layout.TOP:
       this.arrowGraphics.lineStyle(0, 0x3868b8);
-      this.arrowGraphics.moveTo(0, -2 * borderOverlap);
-      this.arrowGraphics.lineTo(width / 2, this.arrow.psHeight - 2 * borderOverlap);
-      this.arrowGraphics.lineTo(width, -2 * borderOverlap);
+      this.arrowGraphics.moveTo(0, - this.settings.bg.padding[0]);
+      this.arrowGraphics.lineTo(width / 2, this.arrow.psHeight - this.settings.bg.padding[0]);
+      this.arrowGraphics.lineTo(width, - this.settings.bg.padding[0]);
       this.arrowGraphics.endFill();
       this.arrowGraphics.lineStyle(1, 0x3868b8);
-      this.arrowGraphics.moveTo(0, -2 * borderOverlap);
-      this.arrowGraphics.lineTo(width / 2, this.arrow.psHeight - 2 * borderOverlap);
-      this.arrowGraphics.lineTo(width, -2 * borderOverlap);
-      this.arrowGraphics.lineTo(width / 2, this.arrow.psHeight - 2 * borderOverlap);
+      this.arrowGraphics.moveTo(0, - this.settings.bg.padding[0]);
+      this.arrowGraphics.lineTo(width / 2, this.arrow.psHeight - this.settings.bg.padding[0]);
+      this.arrowGraphics.lineTo(width, - this.settings.bg.padding[0]);
+      this.arrowGraphics.lineTo(width / 2, this.arrow.psHeight - this.settings.bg.padding[0]);
       break;
     case Layout.BOTTOM:
       this.arrowGraphics.lineStyle(1, 0x3868b8);
-      this.arrowGraphics.moveTo(0, this.arrow.psHeight + borderOverlap);
+      this.arrowGraphics.moveTo(0, this.arrow.psHeight + this.settings.bg.padding[2]);
       this.arrowGraphics.lineTo(width / 2, 0);
-      this.arrowGraphics.lineTo(width, this.arrow.psHeight + borderOverlap);
+      this.arrowGraphics.lineTo(width, this.arrow.psHeight + this.settings.bg.padding[2]);
       break;
   }
   this.arrowGraphics.endFill();

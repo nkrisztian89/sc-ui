@@ -83,7 +83,7 @@ GUIState.prototype.create = function() {
 
   this.bottomPanel = new Panel(game, new FlowLayout(Layout.CENTER, Layout.BOTTOM, Layout.HORIZONTAL, 6));
   this.bottomPanel.setPadding(6);
-  this.bottomPanel.addPanel(Layout.BOTTOM, this.bottomPane = new BottomPane(game, name));
+  this.bottomPanel.addPanel(Layout.BOTTOM, this.bottomPane = new BottomPane(game));
 
   this.selection = new Selection(game);
 
@@ -100,7 +100,7 @@ GUIState.prototype.create = function() {
   this.root.visible = false;
 
   // this.centerPanel.addPanel(Layout.TOP, this.headerPane);
-  //this.centerPanel.addPanel(Layout.CENTER, this.shipPanel);
+  this.centerPanel.addPanel(Layout.CENTER, this.shipPanel);
   this.centerPanel.addPanel(Layout.LEFT, this.leftPane);
 
   this.basePanel.addPanel(Layout.TOP, this.topPanel);
@@ -114,7 +114,7 @@ GUIState.prototype.create = function() {
   this.root1 = new Panel(game, new FlowLayout(Layout.LEFT, Layout.TOP, Layout.VERTICAL, 6));
 
   this.root1.setSize(game.width, game.height);
-
+/*
   this.toolTip1 = new ToolTip(game);
 
   var text = new Label(game, 'Lorem Ipsum is simply dummy text of the\nprinting and typesetting industry. Lorem Ipsum has \nbeen the industry\'s standard dummy text ', {
@@ -147,7 +147,7 @@ GUIState.prototype.create = function() {
 
   this.toolTip3 = new ToolTip(game, {position:Layout.LEFT});
 
-  var text3 = new Label(game, 'Big Res Text', {
+  var text3 = new Label(game, 'Big Red Text', {
     bg: {
       fillAlpha: 0.0,
       borderSize: 0.0
@@ -160,7 +160,7 @@ GUIState.prototype.create = function() {
   this.toolTip3.addContent(Layout.LEFT, text3);
 
   this.root1.addPanel(Layout.STRETCH, this.toolTip3);
-
+*/
   this.toolTip4 = new ToolTip(game, {position:Layout.TOP});
 
   var text4 = new Label(game, 'Top position', {
@@ -175,18 +175,9 @@ GUIState.prototype.create = function() {
   this.root1.addPanel(Layout.STRETCH, this.toolTip4);
 
 
-
-
-/*
-  this.toolTip3 = new ToolTip(game,"left content", {position:Layout.LEFT});
-  this.root1.addPanel(Layout.STRETCH, this.toolTip3);
-  this.toolTip4 = new ToolTip(game,"right content", {position:Layout.RIGHT});
-  this.root1.addPanel(Layout.STRETCH, this.toolTip4);
-*/
-
   // add root to stage
   this.game.stage.addChild(this.root);
-this.game.stage.addChild(this.root1);
+  this.game.stage.addChild(this.root1);
 
   // login
   this.login();

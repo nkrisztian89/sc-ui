@@ -2,15 +2,15 @@
 var engine = require('engine'),
     Panel = require('../Panel'),
     Layout = require('../Layout'),
-    Pane = require('../components/Pane'),
     Label = require('../components/Label'),
+    Pane = require('../components/Pane'),
     BorderLayout = require('../layouts/BorderLayout'),
     BackgroundView = require('../views/BackgroundView'),
     ProgressableButtonIcon = require('../components/ProgressableButtonIcon'),
     ToolTip = require('../components/ToolTip'),
     Class = engine.Class;
 
-function BottomPane(game, string, settings) {
+function BottomPane(game, settings) {
   Panel.call(this, game, new BorderLayout(0, 0));
 
   // default styles
@@ -60,6 +60,18 @@ function BottomPane(game, string, settings) {
   this.iconWithBar1.on('inputUp', this._clicked1, this);
   this.content.addPanel(Layout.NONE, this.iconWithBar1);
   this.iconWithBar1.setProgressBar(0.3);
+
+  //var toolTip4 = new ToolTip(game, {position:Layout.TOP});
+/*
+  var text4 = new Label(game, 'Top position', {
+    bg: {
+      fillAlpha: 0.0,
+      borderSize: 0.0
+    }
+  });
+*/
+  //his.iconWithBar1.addContent(Layout.LEFT, text4);
+
 
 
 }
