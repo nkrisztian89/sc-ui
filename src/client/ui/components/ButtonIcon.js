@@ -10,6 +10,8 @@ var engine = require('engine'),
 function ButtonIcon(game, key, settings) {
   Panel.call(this, game, new StackLayout());
 
+  this._disabled = false;
+
   // default styles
   this.settings = Class.mixin(settings, {
     padding: [2],
@@ -38,10 +40,13 @@ function ButtonIcon(game, key, settings) {
 
   this.image = new Image(game, key, this.settings.icon);
 
+  if(this.settings.disabled) {
+    this.disabled = true;
+  }
+
   this.bg = new BackgroundView(game, this.settings.bg);
   this.bg.inputEnabled = true;
   this.bg.input.priorityID = 2;
-  this.bg.input.useHandCursor = true;
   this.bg.alpha = 0.75;
 
   // event handling
@@ -58,30 +63,59 @@ function ButtonIcon(game, key, settings) {
 ButtonIcon.prototype = Object.create(Panel.prototype);
 ButtonIcon.prototype.constructor = ButtonIcon;
 
-ButtonIcon.prototype.on = function(name, callback, context) {
-  this.bg.on.call(this.bg, name, callback, context);
-};
-
 ButtonIcon.prototype._inputUp = function() {
-  this.bg.tint = 0xFFFFFF;
-  this.image.bg.tint = 0xFFFFFF;
-  // this.emit('inputUp', this);
+  if(this.disabled) { return; }
+
+  this.bg.tint = 0xffffff;
+  this.image.bg.tint = 0xffffff;
+  this.emit('inputUp', this);
 };
 
 ButtonIcon.prototype._inputDown = function() {
-  this.bg.tint = 0xaaccFF;
-  this.image.bg.tint = 0xaaccFF;
-  // this.emit('inputDown', this);
+  if(this.disabled) { return; }
+
+  this.bg.tint = 0xaaccee;
+  this.image.bg.tint = 0xaaccee;
+  this.emit('inputDown', this);
 };
 
 ButtonIcon.prototype._inputOver = function() {
+  if(this.disabled) { return; }
+
   this.bg.alpha = 1.0;
   this.image.alpha = 1.0;
 };
 
 ButtonIcon.prototype._inputOut = function() {
+  if(this.disabled) { return; }
+
   this.bg.alpha = 0.75;
   this.image.alpha = 0.9;
 };
+
+Object.defineProperty(ButtonIcon.prototype, 'tint', {
+  set: function(value) {
+    this.image.tint = value;
+  },
+
+  get: function() {
+    return this.image.tint;
+  }
+});
+
+Object.defineProperty(ButtonIcon.prototype, 'disabled', {
+  set: function(value) {
+    if(value === false) {
+      this.image.tint = 0xFFFFFF;
+    } else {
+      this.image.tint = 0xFF0000;
+    }
+    this._disabled = value;
+  },
+
+  get: function() {
+    return this._disabled;
+  }
+});
 
 module.exports = ButtonIcon;

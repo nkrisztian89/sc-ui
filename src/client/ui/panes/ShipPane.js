@@ -2,75 +2,200 @@
 var engine = require('engine'),
     Layout = require('../Layout'),
     ContentPane = require('./ContentPane'),
-    Tilemap = require('../components/Tilemap');//,
-    // GlitchFilter = require('../../fx/filters/GlitchFilter');
+    SystemPane = require('./SystemPane'),
+    Tilemap = require('../components/Tilemap');
 
-function ShipPane(game, string, settings) {
-  ContentPane.call(this, game, string, settings);
-
-  // glitch filter
-  // this.glitchFilter = new GlitchFilter(game, 256, 128);
-
-  // ship outline
-  this.shipOutline = new engine.Sprite(game, 'ship-outline');
-  this.shipOutline.position.set(6, 21);
-  this.shipOutline.blendMode = engine.BlendMode.ADD;
-  this.shipOutline.alpha = 0.8;
-  // this.shipOutline.filters = [this.glitchFilter];
-  this.addChild(this.shipOutline);
-
-  // create tilemap component
-  this.tilemapComponent = new Tilemap(game, 'ship', ['grid', 'deck', 'wall']);
-
-  // this.crew1 = new engine.Sprite(game, 'crew');
-  // this.crew1.animations.add('work', [0,1,2,3,4,5], 6, true);
-  // this.crew1.animations.play('work');
-  // this.crew1.pivot.set(8,8);
-  // this.crew1.position.set(10 * 16 + 6, 6 * 16 + 8);
-  // this.crew1.rotation = -global.Math.PI / 2;
-
-  // this.crew2 = new engine.Sprite(game, 'crew');
-  // this.crew2.animations.add('work', [2,3,4,5,0,1], 6, true);
-  // this.crew2.animations.play('work');
-  // this.crew2.pivot.set(8,8);
-  // this.crew2.position.set(9 * 16 + 8, 6 * 16 + 7);
+function ShipPane(game, settings) {
+  ContentPane.call(this, game, '', settings);
   
-  // this.crew3 = new engine.Sprite(game, 'crew');
-  // this.crew3.animations.add('work', [2,5,3,4,1,0], 6, true);
-  // this.crew3.animations.play('work');
-  // this.crew3.pivot.set(8,8);
-  // this.crew3.position.set(5 * 16 + 8, 6 * 16 + 7);
+  this.socket = game.net.socket;
+  this.shipNetManager = game.shipNetManager;
 
-  // this.tilemapComponent.addChild(this.crew1);
-  // this.tilemapComponent.addChild(this.crew2);
-  // this.tilemapComponent.addChild(this.crew3);
+  this.current = null;
+  this.isPlayer = settings.player;
 
-  // create doors
-  var door, doors = [
-    [5, 5, 0], [7, 5, 0], [8, 6, 0], [10, 5, 0],
-    [5, 3, 1], [6, 4, 1], [6, 6, 1], [5, 7, 1],
-    [4, 5, 2], [4, 6, 2]
-  ];
-  for(var d in doors) {
-    door = new engine.Sprite(game, 'door', doors[d][2]);
-    if(doors[d][2] === 3) {
-      door.pivot.set(0,-7);
-    } else if(doors[d][2] === 2) {
-      door.pivot.set(9,0);
-    } else if(doors[d][2] === 1) {
-      door.pivot.set(0,-8);
-    } else {
-      door.pivot.set(8,0);
-    }
-    door.position.set(doors[d][0] * 16, doors[d][1] * 16);
-    this.tilemapComponent.addChild(door);
-  }
+  this.panes = {};
+
+  // create blank
+  this.blank = {
+    label: 'none selected',
+    ship: null,
+    data: {},
+    tilemap: new Tilemap(game),
+    system: new SystemPane(game)
+  };
+
+  // 
+  this.button.on('inputUp', this._follow, this);
+
+  // subscribe to messages
+  this.game.on('ships/selected', this._selected, this);
+  this.game.on('ship/target', this._target, this);
+  this.game.on('ship/targeted', this._targeted, this);
+  this.game.on('ship/attack', this._attack, this);
+  this.game.on('ship/destroyed', this._destroyed, this);
   
-  // add tilemap
-  this.addContent(Layout.STRETCH, this.tilemapComponent);
+  // set default
+  this.set(this.blank);
 };
 
 ShipPane.prototype = Object.create(ContentPane.prototype);
 ShipPane.prototype.constructor = ShipPane;
+
+ShipPane.prototype.set = function(data) {
+  this.current && this.reset();
+
+  this.label.text = data.label;
+  
+  this.current = data;
+  this.current.tilemap.start();
+  this.current.tilemap.on('targeted', this._roomTargeted, this);
+  this.current.ship && this._setTargets(this.current.ship.targeted);
+
+  this.addContent(Layout.NONE, data.tilemap);
+  this.title.addPanel(Layout.RIGHT, data.system);
+  this.invalidate(true);
+};
+
+ShipPane.prototype.reset = function() {
+  this.removeContent(this.current.tilemap);
+  this.title.removePanel(this.current.system);
+  this.current.tilemap.stop();
+  this.current.tilemap.removeListener('roomDown', this._roomDown);
+};
+
+ShipPane.prototype._data = function(data) {
+  var system, systems = data.systems,
+      buttons = this.system.buttons,
+      d = this.data;
+  if(systems !== undefined) {
+    for(var s in systems) {
+      system = systems[s];
+      if(system.health < 30) {
+        buttons[s].tint = 0xFF0000;
+      } else if(system.health < 90) {
+        buttons[s].tint = 0xFFFF00;
+      } else {
+        buttons[s].tint = 0x00FF00;
+      }
+    }
+  }
+};
+
+ShipPane.prototype._follow = function() {
+  this.current.ship && this.game.emit('ship/follow', this.current.ship);
+};
+
+ShipPane.prototype._target = function(data) {
+  if(this.isPlayer) {
+    if(this.current !== this.blank) {
+      this.socket.emit('ship/target', {
+        origin: this.current.data.uuid,
+        target: data.target,
+        room: data.room,
+        id: data.id
+      });
+    }
+  }
+};
+
+ShipPane.prototype._setTargets = function(targeted) {
+  var target, battle;
+  for(var t in targeted) {
+    target = targeted[t];
+    battle = this.shipNetManager.getBattleByOriginUuid(target.uuid);
+    battle && this._updateTarget(battle, true);
+  }
+};
+
+ShipPane.prototype._targeted = function(data) {
+  var battle = this.shipNetManager.getBattleByOriginUuid(data.origin);
+      battle && this._updateTarget(battle, false);
+  this._updateTarget(data, true);
+};
+
+ShipPane.prototype._attack = function(data) {
+  var battle = this.shipNetManager.getBattleByOriginUuid(data.origin);
+  if(battle !== undefined) {
+    this._updateTarget(data, true);
+  }
+};
+
+ShipPane.prototype._updateTarget = function(data, show) {
+  var pane = this.panes[data.target];
+      pane && pane.tilemap && pane.tilemap.target(data.id, show);
+};
+
+ShipPane.prototype._destroyed = function(ship) {
+  var battle = this.shipNetManager.getBattleByOriginUuid(ship.uuid);
+      battle && this._updateTarget(battle, false);
+  if(this.current && ship.uuid === this.current.data.uuid) {
+    this.set(this.blank);
+  }
+};
+
+ShipPane.prototype._roomTargeted = function(room) {
+  if(!this.isPlayer) {
+    this.game.emit('ship/target', {
+      target: this.current.data.uuid,
+      room: room.system,
+      id: room.id
+    });
+  }
+};
+
+ShipPane.prototype._roomSelected = function(room) {
+  //..
+};
+
+ShipPane.prototype._selected = function(ships) {
+  var ship, pane,
+      data, matches = 0;
+  for(var s in ships) {
+    ship = ships[s];
+    data = this.shipNetManager.getShipDataByUuid(ship.uuid);
+    if(this._filter(ship)) {
+      if(this.panes[ship.uuid]) {
+        pane = this.panes[ship.uuid];
+      } else {
+        pane = this.panes[ship.uuid] = {
+          label: ship.name,
+          ship: ship,
+          data: data,
+          tilemap: new Tilemap(this.game, ship.name, { player: this.isPlayer }),
+          system: new SystemPane(this.game, {
+            systems: data.systems
+          })
+        };
+        data.on('data', this._data, pane);
+      }
+      if(!ship.destroyed) {
+        if(matches === 0) {
+          this.set(pane);
+
+          if(this.isPlayer) {
+            this.game.emit('gui/player/select', data);
+          }
+        } else {
+          //.. send to ship list
+        }
+        matches++;
+      }
+    }
+  }
+
+  // set to blank
+  if(matches === 0) {
+    this.set(this.blank);
+  }
+
+  // save selection
+  // this.selected = ships;
+};
+
+ShipPane.prototype._filter = function(ship) {
+  return (this.isPlayer && ship.isPlayer) ||
+    (!this.isPlayer && !ship.isPlayer);
+};
 
 module.exports = ShipPane;

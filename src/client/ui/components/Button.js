@@ -42,7 +42,6 @@ function Button(game, string, settings) {
   this.bg = new BackgroundView(game, this.settings.bg);
   this.bg.inputEnabled = true;
   this.bg.input.priorityID = 2;
-  this.bg.input.useHandCursor = true;
   this.bg.alpha = 0.75;
 
   // event handling
@@ -64,14 +63,14 @@ Button.prototype.on = function(name, callback, context) {
 };
 
 Button.prototype._inputUp = function() {
-  this.bg.tint = 0xFFFFFF;
-  this.label.bg.tint = 0xFFFFFF;
+  this.bg.tint = 0xffffff;
+  this.label.bg.tint = 0xffffff;
   this.emit('inputUp', this);
 };
 
 Button.prototype._inputDown = function() {
-  this.bg.tint = 0xaaccFF;
-  this.label.bg.tint = 0xaaccFF;
+  this.bg.tint = 0xaaccee;
+  this.label.bg.tint = 0xaaccee;
   this.emit('inputDown', this);
 };
 

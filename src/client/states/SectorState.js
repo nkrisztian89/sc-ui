@@ -9,18 +9,17 @@ SectorState.prototype.constructor = engine.State;
 SectorState.prototype.init = function(args) {
   global.state = this;
 
-  this.ships = [];
-  
   this.scrollVelocityX = 0;
   this.scrollVelocityY = 0;
 
   this.scrollLock = false;
+  this.game.stage.disableVisibilityChange = true;
 };
 
 SectorState.prototype.preload = function() {
-  this.game.load.image('laser-a', 'imgs/game/turrets/laser-a.png');
-  this.game.load.json('ship-configuration', 'data/ship-configuration.json');
-  this.game.load.atlasJSONHash('ship-atlas', 'imgs/game/ships/ship-atlas.png', 'data/ship-atlas.json');
+  var load = this.game.load;
+      load.image('space', 'imgs/game/space/sector-a.jpg');
+      load.image('station-ubaidian', 'imgs/game/stations/station-ubaidian-home.png');
 };
 
 // loadUpdate = function() {};
@@ -29,11 +28,13 @@ SectorState.prototype.preload = function() {
 SectorState.prototype.create = function() {
   var self = this,
       sensitivity = 1000,
-      mouse = game.input.mouse;
+      mouse = this.game.input.mouse;
       mouse.capture = true;
       mouse.mouseWheelCallback = function(event) {
         var delta = event.deltaY / sensitivity,
-            scale = engine.Math.clamp(this.world.scale.x - delta, 0.5, 1.2);
+            scale = engine.Math.clamp(this.world.scale.x - delta, 0.5, 1.1);
+        if(self.game.paused) { return; }
+        if(self.zoom && self.zoom.isRunning) { self.zoom.stop(); }
         this.world.scale.set(scale, scale);
       };
 
@@ -41,36 +42,23 @@ SectorState.prototype.create = function() {
   this.gui = game.state.getBackgroundState('gui');
 
   this.game.world.setBounds(0, 0, 4096, 4096);
-  this.game.world.scale.set(1.0, 1.0);
+  this.game.world.scale.set(0.8, 0.8);
 
   this.game.camera.bounds = null;
   this.game.camera.focusOnXY(2048, 2048);
 
-  // create ship manager
-  this.shipManager = new solar.sector.ShipManager(this.game);
-  this.shipManager.create({
-    // updated from sync
-    uuid: '1',
-    throttle: 1.0,
-    current: { x: 2048, y: 2048 },
-    rotation: 0.0
-  }, {
-    // held in cache
-    username: 'neutrino',
-    chasis: 'vessel-x01',
-  });
+  this.stationManager = new solar.sector.StationManager(this.game);
+  this.stationManager.boot();
 
-  // show gui
-  this.gui && this.gui.toggle(true);
-  this.game.emit('gui/message', 'ubaidia prime');
+  // gui
+  this.gui.toggle(true);
 };
 
 SectorState.prototype.update = function() {
   var game = this.game,
       camera = game.camera,
       keyboard = game.input.keyboard,
-      // fix this :(
-      // timeStep = this.game.clock.elapsedMS / 1000,
+      // timeStep = this.game.clock.elapsed,
       move = 1.04;// * timeStep;
 
   if(this.scrollLock) { return; }
@@ -90,8 +78,7 @@ SectorState.prototype.update = function() {
   }
 
   // apply velocity
-  camera.view.x -= this.scrollVelocityX;
-  camera.view.y -= this.scrollVelocityY;
+  camera.pan(this.scrollVelocityX, this.scrollVelocityY);
   
   // apply friction
   if(this.scrollVelocityX > 0 || this.scrollVelocityX < 0) {
@@ -113,9 +100,7 @@ SectorState.prototype.update = function() {
 // render = function() {};
 
 SectorState.prototype.resize = function(width, height) {
-  if(this.background !== undefined) {
-    this.background.resize(width, height);
-  }
+
 };
 
 // paused = function() {};
@@ -124,9 +109,6 @@ SectorState.prototype.resize = function(width, height) {
 
 // pauseUpdate = function() {};
 
-SectorState.prototype.shutdown = function() {
-  this.stage.removeChild(this.background);
-  this.background.destroy();
-};
+SectorState.prototype.shutdown = function() {};
 
 module.exports = SectorState;

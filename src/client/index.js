@@ -7,8 +7,9 @@ var pixi = require('pixi'),
 engine.Device.whenReady(function() {
   var game = new engine.Game({
         parent: 'content',
-        antialias: true//,
-        // forceFXAA: true
+        antialias: true,
+        width: 1024,
+        height: 576
       }),
       loadingState = new LoadingState();
 
