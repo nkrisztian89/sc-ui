@@ -4,8 +4,7 @@ var engine = require('engine'),
     Pane = require('../components/Pane'),
     BorderPane = require('../components/BorderPane'),
     Label = require('../components/Label'),
-    Image = require('../components/Image'),
-    Button = require('../components/Button');
+    Image = require('../components/Image');
 
 function RightPane(game, settings) {
   Pane.call(this, game, {
@@ -70,7 +69,7 @@ function RightPane(game, settings) {
     })
 
   this.versionText = new Label(game,
-    'solar crusaders v2024', {
+    'solar crusaders dev', {
       padding: [5],
       text: {
         fontName: 'medium',
@@ -82,18 +81,7 @@ function RightPane(game, settings) {
       }
     });
 
-  this.registerButton = new Button(game, 'beta signup');
-  this.registerButton.on('inputUp', this._register, this);
-
-  this.instructionsButton = new Button(game, 'instructions');
-  this.instructionsButton.on('inputUp', this._instructions, this);
-
   // add layout panels
-  this.addPanel(Layout.CENTER, this.infoBorderPane);
-
-  this.infoBorderPane.addPanel(Layout.LEFT, this.registerButton);
-  this.infoBorderPane.addPanel(Layout.CENTER, this.instructionsButton);
-
   this.addPanel(Layout.CENTER, this.versionText);
 
   this.infoBorderPane2.addPanel(Layout.RIGHT, this.fpsText);
