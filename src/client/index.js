@@ -15,6 +15,7 @@ engine.Device.whenReady(function() {
 
   // create auth
   game.auth = new solar.Auth(game);
+  game.auth.user.uuid = '1';
 
   // create game state
   game.state.add('loader', loadingState, true, true);
