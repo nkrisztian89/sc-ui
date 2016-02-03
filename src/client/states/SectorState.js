@@ -19,11 +19,12 @@ SectorState.prototype.init = function(args) {
 SectorState.prototype.preload = function() {
   var load = this.game.load;
       load.image('space', 'imgs/game/space/sector-a.jpg');
-      load.image('station-ubaidian', 'imgs/game/stations/station-ubaidian-home.png');
+      load.image('arkon', 'imgs/game/planets/arkon.jpg');
+      load.image('clouds', 'imgs/game/planets/clouds.jpg');
+      load.image('laser-red', 'imgs/game/fx/laser-red.png');
+      load.image('laser-blue', 'imgs/game/fx/laser-blue.png');
+      load.image('trails', 'imgs/game/fx/trails.png');
 };
-
-// loadUpdate = function() {};
-// loadRender = function() {};
 
 SectorState.prototype.create = function() {
   var self = this,
@@ -34,7 +35,9 @@ SectorState.prototype.create = function() {
         var delta = event.deltaY / sensitivity,
             scale = engine.Math.clamp(this.world.scale.x - delta, 0.5, 1.1);
         if(self.game.paused) { return; }
-        if(self.zoom && self.zoom.isRunning) { self.zoom.stop(); }
+        if(self.zoom && self.zoom.isRunning) {
+          self.zoom.stop();
+        }
         this.world.scale.set(scale, scale);
       };
 
@@ -47,19 +50,59 @@ SectorState.prototype.create = function() {
   this.game.camera.bounds = null;
   this.game.camera.focusOnXY(2048, 2048);
 
-  this.stationManager = new solar.sector.StationManager(this.game);
-  this.stationManager.boot();
+  // create world
+  this.createManagers();
+  this.createBackground();
+  this.createSnow();
+
+  // create a ship
+  this.shipManager.ships['1'] =
+    this.shipManager.create({
+      uuid: '1',
+      current: { x: 2048, y: 2048 },
+      moving: false,
+      rotation: 0.0,
+      throttle: 1.0
+    }, {
+      user: '1',
+      speed: 3.0,
+      chasis: 'vessel-x01',
+      systems: {},
+      on: function() {},
+      removeListener: function() {}
+    });
 
   // gui
   this.gui.toggle(true);
+};
+
+SectorState.prototype.createManagers = function() {
+  this.shipManager = new solar.sector.ShipManager(this.game);
+  this.shipManager.hudGroup = this.gui.hud;
+  this.selection = new solar.sector.Selection(this);
+};
+
+SectorState.prototype.createBackground = function() {
+  this.background = new solar.fx.Background(this.game, this.game.width, this.game.height);
+  this.background.uncache();
+
+  this.planet = new solar.fx.Planet(this.game, 'arkon');
+  this.planet.position.set(2048 / 6, 2048 / 6);
+
+  this.game.world.background.add(this.planet);
+  this.game.stage.addChildAt(this.background, 0);
+};
+
+SectorState.prototype.createSnow = function() {
+  //..
 };
 
 SectorState.prototype.update = function() {
   var game = this.game,
       camera = game.camera,
       keyboard = game.input.keyboard,
-      // timeStep = this.game.clock.elapsed,
-      move = 1.04;// * timeStep;
+      timeStep = this.game.clock.elapsedMS / 16,
+      move = 1.04; // * timeStep;
 
   if(this.scrollLock) { return; }
 
@@ -95,20 +138,12 @@ SectorState.prototype.update = function() {
   }
 };
 
-// preRender = function() {};
-
-// render = function() {};
-
 SectorState.prototype.resize = function(width, height) {
-
+  console.log('resize');
 };
 
-// paused = function() {};
-
-// resumed = function() {};
-
-// pauseUpdate = function() {};
-
-SectorState.prototype.shutdown = function() {};
+SectorState.prototype.shutdown = function() {
+  console.log('shutdown');
+};
 
 module.exports = SectorState;

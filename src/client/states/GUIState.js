@@ -81,40 +81,40 @@ GUIState.prototype.create = function() {
       
   this.leftPane = new LeftPane(game);
   this.rightPane = new RightPane(game);
-  this.bottomPane = new BottomPane(game);
-  this.vitalsPane = new VitalsPane(game);
+  // this.bottomPane = new BottomPane(game);
+  // this.vitalsPane = new VitalsPane(game);
 
-  this.shipPanel = new Panel(game, new FlowLayout(Layout.LEFT, Layout.TOP, Layout.VERTICAL, 6));
-  this.shipPanel.setPadding(6);
-  this.shipPanel.addPanel(Layout.NONE,
-    this.shipPane =
-      new ShipPane(game, {
-        player: true
-      }));
+  // this.shipPanel = new Panel(game, new FlowLayout(Layout.LEFT, Layout.TOP, Layout.VERTICAL, 6));
+  // this.shipPanel.setPadding(6);
+  // this.shipPanel.addPanel(Layout.NONE,
+  //   this.shipPane =
+  //     new ShipPane(game, {
+  //       player: true
+  //     }));
 
-  this.targetPanel = new Panel(game, new FlowLayout(Layout.RIGHT, Layout.TOP, Layout.VERTICAL, 6));
-  this.targetPanel.setPadding(6);
-  this.targetPanel.addPanel(Layout.NONE,
-    this.targetPane =
-      new ShipPane(game, {
-        player: false
-      }));
+  // this.targetPanel = new Panel(game, new FlowLayout(Layout.RIGHT, Layout.TOP, Layout.VERTICAL, 6));
+  // this.targetPanel.setPadding(6);
+  // this.targetPanel.addPanel(Layout.NONE,
+  //   this.targetPane =
+  //     new ShipPane(game, {
+  //       player: false
+  //     }));
 
   this.topPanel = new Panel(game, new FlowLayout(Layout.CENTER, Layout.TOP, Layout.HORIZONTAL, 6));
   this.topPanel.addPanel(Layout.NONE, this.rightPane);
   this.topPanel.visible = false;
 
-  this.bottomPanel = new Panel(game, new FlowLayout(Layout.CENTER, Layout.TOP, Layout.VERTICAL, 3));
-  this.bottomPanel.addPanel(Layout.NONE, this.bottomPane);
-  this.bottomPanel.addPanel(Layout.NONE, this.vitalsPane);
-  this.bottomPanel.visible = false;
+  // this.bottomPanel = new Panel(game, new FlowLayout(Layout.CENTER, Layout.TOP, Layout.VERTICAL, 3));
+  // this.bottomPanel.addPanel(Layout.NONE, this.bottomPane);
+  // this.bottomPanel.addPanel(Layout.NONE, this.vitalsPane);
+  // this.bottomPanel.visible = false;
 
-  this.centerPanel.addPanel(Layout.CENTER, this.shipPanel);
+  // this.centerPanel.addPanel(Layout.CENTER, this.shipPanel);
   this.centerPanel.addPanel(Layout.LEFT, this.leftPane);
-  this.centerPanel.addPanel(Layout.RIGHT, this.targetPanel);
+  // this.centerPanel.addPanel(Layout.RIGHT, this.targetPanel);
   
   this.basePanel.addPanel(Layout.TOP, this.topPanel);
-  this.basePanel.addPanel(Layout.BOTTOM, this.bottomPanel);
+  // this.basePanel.addPanel(Layout.BOTTOM, this.bottomPanel);
 
   this.root = new Panel(game, new StackLayout());
   this.root.setSize(game.width, game.height);
@@ -145,8 +145,8 @@ GUIState.prototype.login = function() {
   // if(this.auth.isUser()) {
     this.centerPanel.visible = true;
     this.centerPanel.invalidate();
-    this.bottomPanel.visible = true;
-    this.bottomPanel.invalidate();
+    // this.bottomPanel.visible = true;
+    // this.bottomPanel.invalidate();
     this.topPanel.visible = true;
     this.topPanel.invalidate();
   // } else {
