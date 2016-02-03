@@ -100,14 +100,6 @@ RightPane.prototype.validate = function() {
   return Pane.prototype.validate.call(this);
 };
 
-RightPane.prototype._register = function() {
-  this.game.emit('gui/registration');
-};
-
-RightPane.prototype._instructions = function() {
-  global.document.location.href = 'http://forums.solarcrusaders.com/topic/47/battle-module-f2p-holiday-special';
-};
-
 RightPane.prototype._updateInfo = function() {
   this.fpsText.text = this.game.clock.fps + ' fps';
   this.pingText.text = this.game.net.rtt + ' rtt';
