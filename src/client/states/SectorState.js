@@ -23,7 +23,6 @@ SectorState.prototype.preload = function() {
       load.image('clouds', 'imgs/game/planets/clouds.jpg');
       load.image('laser-red', 'imgs/game/fx/laser-red.png');
       load.image('laser-blue', 'imgs/game/fx/laser-blue.png');
-      load.image('trails', 'imgs/game/fx/trails.png');
 };
 
 SectorState.prototype.create = function() {
