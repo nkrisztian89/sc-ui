@@ -580,15 +580,6 @@
           "laser": {
             "sprite": "laser-red"
           }
-        }, {
-          "sprite": "turret-b",
-          "pivot": { "x": 32, "y": 32 },
-          "position": { "x": 172, "y": 128 },
-          "scale": { "x": 0.6 , "y": 0.6 },
-          "type": "laser",
-          "laser": {
-            "sprite": "laser-blue"
-          }
         }
       ]
     },
