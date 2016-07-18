@@ -71,6 +71,10 @@ SectorState.prototype.create = function() {
       removeListener: function() {}
     });
 
+  // default select
+  this.game.emit('ship/follow', this.shipManager.ships['1']);
+  this.game.emit('ships/selected', [this.shipManager.ships['1']]);
+
   // gui
   this.gui.toggle(true);
 };
