@@ -3,7 +3,7 @@
     "name": "solarcrusaders",
     "version": "0.0.1",
     "dependencies": {
-        "pixi.js": "dev"
+        "pixi.js": "https://github.com/pixijs/pixi.js.git#c5e13c53b88791370a706e3b4f7aff21a71b4930"
     },
     "devDependencies": {}
 }
