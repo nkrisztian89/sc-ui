@@ -4,6 +4,7 @@ var xhr = require('xhr'),
     Layout = require('../Layout'),
     Pane = require('../components/Pane'),
     ButtonIcon = require('../components/ButtonIcon');
+	Tooltip = require('../components/Tooltip');
 
 function LeftPane(game, settings) {
   Pane.call(this, game, {
@@ -21,8 +22,11 @@ function LeftPane(game, settings) {
 
   this.icon1 = new ButtonIcon(game, 'texture-atlas', { icon: { frame: 'icon-x01.png' }});
   this.icon1.on('inputUp', this._logout, this);
+  
+  this.tooltip = new Tooltip(game, "Logout", this.icon1, {direction: 'left'});
 
   this.addPanel(Layout.NONE, this.icon1);
+  this.addPanel(Layout.NONE, this.tooltip);
 };
 
 LeftPane.prototype = Object.create(Pane.prototype);
