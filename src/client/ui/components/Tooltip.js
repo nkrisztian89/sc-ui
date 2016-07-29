@@ -76,21 +76,20 @@ function Tooltip(game, string, component, settings) {
 	}));
 	this.arrowPanel.addPanel(Layout.USE_PS_SIZE, this.arrow);
 
-	this.bg = new BackgroundView(game, this.settings.bg);
-	this.bg.inputEnabled = true;
-	this.bg.input.priorityID = 2;
-	this.bg.alpha = 0.75;
+	// this.bg = new BackgroundView(game, this.settings.bg);
+	// this.bg.inputEnabled = true;
+	// this.bg.input.priorityID = 2;
+	// this.bg.alpha = 0.75;
 	
 	// event handling
-	this.parent = component;
-	this.parent.on('inputOver', this._inputOver, this);
-	this.parent.on('inputOut', this._inputOut, this);
+	component.bg.on('inputOver', this._inputOver, this);
+	component.bg.on('inputOut', this._inputOut, this);
 	
-	console.log("Component: %o", this.parent);
-	console.log("x: %d | y: %d", this.parent.x, this.parent.y);
+	console.log("Component: %o", component);
+	console.log("x: %d | y: %d", component.x, component.y);
 	
 	// build tooltip
-	this.addView(this.bg);
+	// this.addView(this.bg);
 	this.addPanel(Layout.CENTER, this.message);
 	this.addPanel(this.getBorderLayoutConstraint(), this.arrowPanel);
 }
@@ -98,19 +97,19 @@ function Tooltip(game, string, component, settings) {
 Tooltip.prototype = Object.create(Panel.prototype);
 Tooltip.prototype.constructor = Tooltip;
 
-Tooltip.prototype.on = function(name, callback, context) {
-	this.bg.on.call(this.bg, name, callback, context);
-};
+// Tooltip.prototype.on = function(name, callback, context) {
+// 	this.bg.on.call(this.bg, name, callback, context);
+// };
 
 Tooltip.prototype._inputOver = function() {
-	this.bg.alpha = 1.0;
-	this.bg.tint = 0xFF0000;
+	this.message.bg.alpha = 1.0;
+	this.message.bg.tint = 0xFF0000;
 	console.log("InputOver() called");
 };
 
 Tooltip.prototype._inputOut = function() {
-	this.bg.alpha = 1.0;
-	this.bg.tint = 0x00FF00;
+	this.message.bg.alpha = 1.0;
+	this.message.bg.tint = 0x00FF00;
 	console.log("InputOut() called");
 };
 
