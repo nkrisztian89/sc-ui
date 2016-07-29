@@ -22,11 +22,18 @@ function LeftPane(game, settings) {
 
   this.icon1 = new ButtonIcon(game, 'texture-atlas', { icon: { frame: 'icon-x01.png' }});
   this.icon1.on('inputUp', this._logout, this);
+
+  this.icon1.on('inputOver', function() {
+    this.addPanel(Layout.RIGHT, this.tooltip);
+  }, this);
   
-  this.tooltip = new Tooltip(game, "Logout", this.icon1);
+  this.icon1.on('inputOut', function() {
+    this.removePanel(this.tooltip);
+  }, this);
+  
+  this.tooltip = new Tooltip(game, 'Logout', this.icon1);
   
   this.addPanel(Layout.NONE, this.icon1);
-  this.addPanel(Layout.RIGHT, this.tooltip);
 };
 
 LeftPane.prototype = Object.create(Pane.prototype);

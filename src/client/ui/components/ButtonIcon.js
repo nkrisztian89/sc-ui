@@ -68,6 +68,7 @@ ButtonIcon.prototype._inputUp = function() {
 
   this.bg.tint = 0xffffff;
   this.image.bg.tint = 0xffffff;
+
   this.emit('inputUp', this);
 };
 
@@ -76,6 +77,7 @@ ButtonIcon.prototype._inputDown = function() {
 
   this.bg.tint = 0xaaccee;
   this.image.bg.tint = 0xaaccee;
+
   this.emit('inputDown', this);
 };
 
@@ -84,6 +86,8 @@ ButtonIcon.prototype._inputOver = function() {
 
   this.bg.alpha = 1.0;
   this.image.alpha = 1.0;
+
+  this.emit('inputOver', this);
 };
 
 ButtonIcon.prototype._inputOut = function() {
@@ -91,6 +95,8 @@ ButtonIcon.prototype._inputOut = function() {
 
   this.bg.alpha = 0.75;
   this.image.alpha = 0.9;
+  
+  this.emit('inputOut', this);
 };
 
 Object.defineProperty(ButtonIcon.prototype, 'tint', {
