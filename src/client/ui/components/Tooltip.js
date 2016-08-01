@@ -5,6 +5,7 @@ var engine = require('engine'),
 	Layout = require('../Layout'),
 	BorderLayout = require('../layouts/BorderLayout'),
 	StackLayout = require('../layouts/StackLayout'),
+	RasterLayout = require('../layouts/RasterLayout'),
 	BackgroundView = require('../views/BackgroundView'),
 	ShapeView = require('../views/ShapeView'),
 	Point = engine.Point;
@@ -22,17 +23,8 @@ function Tooltip(game, string, component, settings) {
 
 	// default styles
 	this.settings = Class.mixin(settings, {
-		padding: [0],
-		border: [0],
-		bg: {
-			fillAlpha: 0.0,
-			color: 0x000000,
-			borderSize: 0.0,
-			blendMode: engine.BlendMode.ADD,
-			radius: 0.0
-		},
 		message: {
-			padding: [8],
+			padding: [9],
 			bg: {
 				fillAlpha: 1.0,
 				color: 0x000000,
@@ -50,17 +42,13 @@ function Tooltip(game, string, component, settings) {
 		arrow: {
 			size: 8
 		},
-		direction: Tooltip.UP
+		direction: Tooltip.LEFT
 	});
 	
 	// determine style for arrow
 	this.settings.arrow.sh = this.settings.message.bg;
 	this.settings.arrow.size += this.settings.arrow.sh.borderSize;
 	this.settings.arrow.direction = this.settings.direction;
-	
-	// outer panel style
-	this.setPadding.apply(this, this.settings.padding);
-	this.setBorder.apply(this, this.settings.border);
 
 	// message init
 	this.message = new Label(game, string, this.settings.message);
@@ -68,53 +56,73 @@ function Tooltip(game, string, component, settings) {
 	// arrow and arrowPanel init
 	this.arrow = new Arrow(game, this.settings.arrow);
 	this.arrowPanel = new Panel(game, new StackLayout());
-	this.arrowPanel.addView(new BackgroundView(game, {
-		fillAlpha: 0.0,
-		color: 0x000000,
-		borderSize: 0.0,
-		radius: 0.0
-	}));
 	this.arrowPanel.addPanel(Layout.USE_PS_SIZE, this.arrow);
 
-	// this.bg = new BackgroundView(game, this.settings.bg);
-	// this.bg.inputEnabled = true;
-	// this.bg.input.priorityID = 2;
-	// this.bg.alpha = 0.75;
+	this.visible = false;
 	
 	// event handling
+	if(!component.bg.inputEnabled) {
+		component.bg.inputEnabled = true;
+		component.bg.input.priorityID = 2;
+		component.bg.alpha = 0.75;
+	}
+	
 	component.bg.on('inputOver', this._inputOver, this);
 	component.bg.on('inputOut', this._inputOut, this);
 	
-	console.log("Component: %o", component);
-	console.log("x: %d | y: %d", component.x, component.y);
-	
 	// build tooltip
-	// this.addView(this.bg);
 	this.addPanel(Layout.CENTER, this.message);
-	this.addPanel(this.getBorderLayoutConstraint(), this.arrowPanel);
+	this.addPanel(this.getLayoutConstraint(), this.arrowPanel);
+	
+	// attach tooltip to parent
+	this.raster = new Panel(game, new RasterLayout());
+	this.raster.setPadding(0);
+	this.raster.addPanel(Layout.NONE, this);
+	component.addPanel(Layout.USE_PS_SIZE, this.raster);
+	
+	this.determineSize();
+	this.place();
 }
 
 Tooltip.prototype = Object.create(Panel.prototype);
 Tooltip.prototype.constructor = Tooltip;
 
-// Tooltip.prototype.on = function(name, callback, context) {
-// 	this.bg.on.call(this.bg, name, callback, context);
-// };
-
 Tooltip.prototype._inputOver = function() {
-	this.message.bg.alpha = 1.0;
-	this.message.bg.tint = 0xFF0000;
-	console.log("InputOver() called");
+	this.visible = true;
+	this.invalidate();
 };
 
 Tooltip.prototype._inputOut = function() {
-	this.message.bg.alpha = 1.0;
-	this.message.bg.tint = 0x00FF00;
-	console.log("InputOut() called");
+	this.visible = false;
+	this.invalidate();
 };
 
-// returns the correct BorderLayout constraint based on the direction
-Tooltip.prototype.getBorderLayoutConstraint = function() {
+Tooltip.prototype.place = function() {
+	var toolPS = this.getPreferredSize(),
+		rasterPS = this.parent.getPreferredSize(),
+		compPD = this.parent.parent.padding,
+		loc;
+	switch(this.settings.direction) {
+		case Tooltip.UP:
+			loc = {x: (rasterPS.width - toolPS.width)/2, y: rasterPS.height + compPD.bottom};
+			break;
+		case Tooltip.LEFT:
+			loc = {x: rasterPS.width + compPD.right, y: (rasterPS.height - toolPS.height)/2};
+			break;
+		case Tooltip.DOWN:
+			loc = {x: (rasterPS.width - toolPS.width)/2, y: -toolPS.height - compPD.top};
+			break;
+		case Tooltip.RIGHT:
+			loc = {x: -toolPS.width - compPD.left, y: (rasterPS.height - toolPS.height)/2};
+			break;
+		default:
+			throw new Error("Invalid Direction");
+	}
+	this.setLocation(loc.x, loc.y);
+};
+
+// returns the correct layout constraint based on the direction
+Tooltip.prototype.getLayoutConstraint = function() {
 	switch(this.settings.direction) {
 		case Tooltip.UP:
 			return Layout.TOP;
@@ -127,6 +135,16 @@ Tooltip.prototype.getBorderLayoutConstraint = function() {
 		default:
 			throw new Error("Invalid Direction");
 	}
+};
+
+Tooltip.prototype.determineSize = function() {
+	var compPS = this.parent.parent.getPreferredSize(),
+		compPD = this.parent.parent.padding,
+		ps = {
+			width: compPS.width-compPD.left-compPD.right,
+			height: compPS.height-compPD.top-compPD.bottom
+		};
+	this.raster.setPreferredSize(ps.width, ps.height);
 };
 
 // directional constants to place Tooltip (relative to parent)
@@ -160,7 +178,7 @@ function Arrow(game, settings) {
 	this.setPadding.apply(this, this.settings.padding);
 	this.setBorder.apply(this, this.settings.border);
 	
-	this.setDeterminedSize();
+	this.determineSize();
 	
 	this.settings.back = {
 		sh: {
@@ -178,9 +196,12 @@ function Arrow(game, settings) {
 	}
 	this.centerShape(this.settings.front.sh.shape, this.settings.sh.borderSize);
 	
+	this.back = new ShapeView(game, this.settings.back.sh);
+	this.front = new ShapeView(game, this.settings.front.sh);
+	
 	// build arrow
-	this.addView(new ShapeView(game, this.settings.back.sh));
-	this.addView(new ShapeView(game, this.settings.front.sh));
+	this.addView(this.back);
+	this.addView(this.front);
 }
 
 Arrow.prototype = Object.create(Panel.prototype);
@@ -188,7 +209,7 @@ Arrow.prototype.constructor = Arrow;
 
 // sets the minimum size required for the arrow
 // size is adjusted for the shift of the arrows toward the center message label
-Arrow.prototype.setDeterminedSize = function() {
+Arrow.prototype.determineSize = function() {
 	var size = this.settings.size,
 		offset = Math.round(this.settings.sh.borderSize/2),
 		ps;

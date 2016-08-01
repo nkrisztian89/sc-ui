@@ -26,7 +26,6 @@ function LeftPane(game, settings) {
   this.tooltip = new Tooltip(game, 'Logout', this.icon1);
   
   this.addPanel(Layout.NONE, this.icon1);
-  this.addPanel(Layout.RIGHT, this.tooltip);
 };
 
 LeftPane.prototype = Object.create(Pane.prototype);
