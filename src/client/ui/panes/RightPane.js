@@ -4,7 +4,9 @@ var engine = require('engine'),
     Pane = require('../components/Pane'),
     BorderPane = require('../components/BorderPane'),
     Label = require('../components/Label'),
-    Image = require('../components/Image');
+    Image = require('../components/Image'),
+	ButtonIcon = require('../components/ButtonIcon'),
+	Tooltip = require('../components/Tooltip');
 
 function RightPane(game, settings) {
   Pane.call(this, game, {
@@ -83,12 +85,15 @@ function RightPane(game, settings) {
 
   // add layout panels
   this.addPanel(Layout.CENTER, this.versionText);
+  
+  this.icon1 = new ButtonIcon(game, 'texture-atlas', { icon: { frame: 'icon-x01.png' }});
+  this.tooltip = new Tooltip(game, 'Button', this.icon1);
 
   this.infoBorderPane2.addPanel(Layout.RIGHT, this.fpsText);
   this.infoBorderPane2.addPanel(Layout.LEFT, this.pingText);
-
+  
   this.addPanel(Layout.CENTER, this.infoBorderPane2);
-
+  this.addPanel(Layout.CENTER, this.icon1);
   // create timer
   game.clock.events.loop(500, this._updateInfo, this);
 };

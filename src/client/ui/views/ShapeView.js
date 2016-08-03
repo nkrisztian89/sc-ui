@@ -16,6 +16,7 @@ function ShapeView(game, settings) {
 		borderAlpha: 0.0,
 		borderColor: 0x000000,
 		borderSize: 0.0,
+		shape: [new Point(0, 0)],
 		blendMode: engine.BlendMode.NORMAL,
 	});
 	
