@@ -75,6 +75,7 @@ function Tooltip(game, string, component, settings) {
 	
 	// build tooltip
 	this.addPanel(Layout.CENTER, this.message);
+	this.addPanel(Layout.CENTER, this.arrowPanel);
 	
 	// add panels and place tooltip
 	this.raster.addPanel(Layout.NONE, this);
@@ -99,14 +100,9 @@ Tooltip.prototype._inputOut = function() {
 
 Tooltip.prototype.readjust = function(direction) {
 	this.settings.direction = direction;
-	this.determineSize();
-	this.removePanel(this.message);
-	this.removePanel(this.arrowPanel);
-	this.arrowPanel.removePanel(this.arrow);
+	this.arrowPanel.constraint = this.getLayoutConstraint(direction);
 	this.arrow.readjust(direction);
-	this.arrowPanel.addPanel(Layout.USE_PS_SIZE, this.arrow);
-	this.addPanel(Layout.CENTER, this.message);
-	this.addPanel(this.getLayoutConstraint(direction), this.arrowPanel);
+	this.determineSize();
 	this.place(direction);
 };
 
@@ -211,14 +207,11 @@ function Arrow(game, settings) {
 			borderAlpha: 0.0,
 			borderColor: 0x000000,
 			borderSize: 0.0,
-		}/*,
-		direction: Tooltip.UP*/
+		}
 	});
 	
 	this.setPadding.apply(this, this.settings.padding);
 	this.setBorder.apply(this, this.settings.border);
-	
-	// this.determineSize();
 	
 	this.settings.back = {
 		sh: {
