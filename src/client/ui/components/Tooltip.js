@@ -4,27 +4,23 @@ var engine = require('engine'),
 	Label = require('./Label'),
 	Layout = require('../Layout'),
 	BorderLayout = require('../layouts/BorderLayout'),
-	StackLayout = require('../layouts/StackLayout'),
 	RasterLayout = require('../layouts/RasterLayout'),
 	BackgroundView = require('../views/BackgroundView'),
 	ShapeView = require('../views/ShapeView'),
 	Point = engine.Point;
-	Polygon = engine.Polygon;
 	Class = engine.Class;
 
 /* Tooltip Prototype - creates a Tooltip */
-/**
- * TODO:
- *   - calculate appropriate location
- *   - animate tooltip on hover
-**/
 function Tooltip(game, string, component, settings) {
 	Panel.call(this, game, new BorderLayout());
 
 	// default styles
 	this.settings = Class.mixin(settings, {
+		padding: [0],
+		border: [0],
 		message: {
 			padding: [9],
+			border: [0],
 			bg: {
 				fillAlpha: 1.0,
 				color: 0x000000,
@@ -44,42 +40,25 @@ function Tooltip(game, string, component, settings) {
 		}
 	});
 	
-	// initialization
+	this.setPadding.apply(this, this.settings.padding);
+	this.setBorder.apply(this, this.settings.border);
+	
 	this.visible = false;
-	this.component = component;
 	
-	// raster panel init
-	this.raster = new Panel(game, new RasterLayout());
-	
-	// message init
 	this.message = new Label(game, string, this.settings.message);
 	
 	// determine style for arrow
 	this.settings.arrow.sh = this.settings.message.bg;
 	this.settings.arrow.size += this.settings.arrow.sh.borderSize;
 	
-	// arrow and arrowPanel init
 	this.arrow = new Arrow(game, this.settings.arrow);
-	this.arrowPanel = new Panel(game, new StackLayout());
+	this.arrowPanel = new Panel(game);
 	this.arrowPanel.addPanel(Layout.USE_PS_SIZE, this.arrow);
-	
-	// event handling
-	if(!this.component.bg.inputEnabled) {
-		this.component.bg.inputEnabled = true;
-		this.component.bg.input.priorityID = 2;
-		this.component.bg.alpha = 0.75;
-	}
-	
-	this.component.bg.on('inputOver', this._inputOver, this);
-	this.component.bg.on('inputOut', this._inputOut, this);
 	
 	// build tooltip
 	this.addPanel(Layout.CENTER, this.message);
 	this.addPanel(Layout.CENTER, this.arrowPanel);
-	
-	// add panels and place tooltip
-	this.raster.addPanel(Layout.NONE, this);
-	this.component.addPanel(Layout.NONE, this.raster);
+	this.attachTo(component);
 }
 
 Tooltip.prototype = Object.create(Panel.prototype);
@@ -98,12 +77,36 @@ Tooltip.prototype._inputOut = function() {
 	this.invalidate();
 };
 
+// adds tooltip to component
+Tooltip.prototype.attachTo = function(component) {
+	this.component = component;
+	this.raster = new Panel(game, new RasterLayout());
+	
+	// event handling
+	if(!this.component.bg.inputEnabled) {
+		this.component.bg.inputEnabled = true;
+		this.component.bg.input.priorityID = 2;
+		this.component.bg.alpha = 0.75;
+	}
+	
+	this.component.bg.on('inputOver', this._inputOver, this);
+	this.component.bg.on('inputOut', this._inputOut, this);
+	
+	// add panels and place tooltip
+	this.raster.addPanel(Layout.NONE, this);
+	this.component.addPanel(Layout.NONE, this.raster);
+}
+
+// repositions and redirects tooltip according to the new direction
 Tooltip.prototype.readjust = function(direction) {
+	var rasterPS = this.calcPreferredSize(),
+		loc;
 	this.settings.direction = direction;
 	this.arrowPanel.constraint = this.getLayoutConstraint(direction);
 	this.arrow.readjust(direction);
-	this.determineSize();
-	this.place(direction);
+	this.raster.setPreferredSize(rasterPS.width, rasterPS.height);
+	loc = this.calcLocation(direction);
+	this.setLocation(loc.x, loc.y);
 };
 
 // returns the correct layout constraint based on the direction
@@ -123,39 +126,32 @@ Tooltip.prototype.getLayoutConstraint = function(direction) {
 };
 
 // determines where the Tooltip should be located based on direction
-Tooltip.prototype.place = function(direction) {
+Tooltip.prototype.calcLocation = function(direction) {
 	var toolPS = this.getPreferredSize(),
 		rasterPS = this.raster.getPreferredSize(),
-		compPD = this.component.padding,
-		loc;
+		compPD = this.component.padding;
 	switch(direction) {
 		case Tooltip.UP:
-			loc = {x: (rasterPS.width - toolPS.width)/2, y: rasterPS.height + compPD.bottom};
-			break;
+			return {x: (rasterPS.width - toolPS.width)/2, y: rasterPS.height + compPD.bottom};
 		case Tooltip.LEFT:
-			loc = {x: rasterPS.width + compPD.right, y: (rasterPS.height - toolPS.height)/2};
-			break;
+			return {x: rasterPS.width + compPD.right, y: (rasterPS.height - toolPS.height)/2};
 		case Tooltip.DOWN:
-			loc = {x: (rasterPS.width - toolPS.width)/2, y: -toolPS.height - compPD.top};
-			break;
+			return {x: (rasterPS.width - toolPS.width)/2, y: -toolPS.height - compPD.top};
 		case Tooltip.RIGHT:
-			loc = {x: -toolPS.width - compPD.left, y: (rasterPS.height - toolPS.height)/2};
-			break;
+			return {x: -toolPS.width - compPD.left, y: (rasterPS.height - toolPS.height)/2};
 		default:
 			throw new Error("Invalid Direction");
 	}
-	this.setLocation(loc.x, loc.y);
 };
 
 // determines the correct size for the raster panel to fit inside its parent
-Tooltip.prototype.determineSize = function() {
+Tooltip.prototype.calcPreferredSize = function() {
 	var compPS = this.component.getPreferredSize(),
-		compPD = this.component.padding,
-		ps = {
-			width: compPS.width-compPD.left-compPD.right,
-			height: compPS.height-compPD.top-compPD.bottom
-		};
-	this.raster.setPreferredSize(ps.width, ps.height);
+		compPD = this.component.padding;
+	return {
+		width: compPS.width - compPD.left - compPD.right,
+		height: compPS.height - compPD.top - compPD.bottom
+	};
 };
 
 // calculates which direction the Tooltip should face based on available space
@@ -237,9 +233,11 @@ function Arrow(game, settings) {
 Arrow.prototype = Object.create(Panel.prototype);
 Arrow.prototype.constructor = Arrow;
 
+// repositions and redirects arrow according to the new direction
 Arrow.prototype.readjust = function(direction) {
+	var ps = this.calcPreferredSize(direction);
 	this.settings.direction = direction;
-	this.determineSize();
+	this.setPreferredSize(ps.width, ps.height);
 	this.back.settings.shape = this.makeShape(this.settings.size);
 	this.front.settings.shape = this.makeShape(this.settings.size - this.settings.sh.borderSize);
 	this.centerShape(this.front.settings.shape, this.settings.sh.borderSize);
@@ -247,25 +245,22 @@ Arrow.prototype.readjust = function(direction) {
 
 // sets the minimum size required for the arrow
 // size is readjusted for the shift of the arrows toward the center message label
-Arrow.prototype.determineSize = function() {
+Arrow.prototype.calcPreferredSize = function(direction) {
 	var size = this.settings.size,
-		offset = global.Math.round(this.settings.sh.borderSize/2),
-		ps;
-	switch(this.settings.direction) {
+		offset = global.Math.round(this.settings.sh.borderSize/2);
+	switch(direction) {
 		case Tooltip.UP:
 		case Tooltip.DOWN:
-			ps = {width: size*2, height: size-offset};
-			break;
+			return {width: size*2, height: size-offset};
 		case Tooltip.LEFT:
 		case Tooltip.RIGHT:
-			ps = {width: size-offset, height: size*2};
-			break;
+			return {width: size-offset, height: size*2};
 		default:
 			throw new Error("Invalid Direction");
 	}
-	this.setPreferredSize(ps.width, ps.height);
 };
 
+// shifts the given shape along an axis using the given offset
 Arrow.prototype.shiftShape = function (shape, axis, offset) {
 	for(var i = 0; i < shape.length; i++)
 		shape[i][axis] += offset;
