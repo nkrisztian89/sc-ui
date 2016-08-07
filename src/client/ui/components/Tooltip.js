@@ -44,6 +44,7 @@ function Tooltip(game, string, component, settings) {
 	this.setBorder.apply(this, this.settings.border);
 	
 	this.visible = false;
+	this.alpha = 1.0;
 	
 	this.message = new Label(game, string, this.settings.message);
 	
@@ -162,12 +163,13 @@ Tooltip.prototype.determineDirection = function() {
 			height: window.innerHeight || document.documentElement.clientHeight ||
 				document.body.clientHeight
 		},
-		spaceUp = this.component.position.y,
-		spaceDown = windowDim.height - this.component.height - this.component.y,
-		spaceLeft = this.component.position.x,
-		spaceRight = windowDim.width - this.component.width - this.component.x,
+		absLocation = this.component.getAbsoluteLocation(),
+		spaceUp = absLocation.y,
+		spaceDown = windowDim.height - (spaceUp + this.component.width),
+		spaceLeft = absLocation.x,
+		spaceRight = windowDim.width - (spaceLeft + this.component.height),
 		direction;
-		
+	
 	if(global.Math.max(spaceUp, spaceDown) >= global.Math.max(spaceLeft, spaceRight)) {
 		if(spaceUp >= spaceDown)
 			direction = Tooltip.DOWN;

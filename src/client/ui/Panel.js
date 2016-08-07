@@ -1,6 +1,7 @@
 
 var engine = require('engine'),
-    StackLayout = require('./layouts/StackLayout');
+    StackLayout = require('./layouts/StackLayout'),
+	Point = engine.Point;
 
 function Panel(game, layout, constraint) {
   engine.Group.call(this, game);
@@ -192,6 +193,19 @@ Panel.prototype.setLocation = function(xx, yy) {
       this.relocated(xx, yy);
     }
   }
+};
+
+Panel.prototype.getAbsoluteLocation = function() {
+	var absLocation;
+	if(this.parent && this.parent.getAbsoluteLocation)
+	{
+		absLocation = this.parent.getAbsoluteLocation();
+		absLocation.x += this.x;
+		absLocation.y += this.y;
+	}
+	else
+		absLocation = new Point(this.x, this.y);
+	return absLocation;
 };
 
 Panel.prototype.setPreferredSize = function(width, height) {
