@@ -1,7 +1,6 @@
 
 var engine = require('engine'),
-    StackLayout = require('./layouts/StackLayout'),
-	Point = engine.Point;
+    StackLayout = require('./layouts/StackLayout');
 
 function Panel(game, layout, constraint) {
   engine.Group.call(this, game);
@@ -200,11 +199,11 @@ Panel.prototype.getAbsoluteLocation = function() {
 	if(this.parent && this.parent.getAbsoluteLocation)
 	{
 		absLocation = this.parent.getAbsoluteLocation();
-		absLocation.x += this.x;
-		absLocation.y += this.y;
+		absLocation.x += this.position.x;
+		absLocation.y += this.position.y;
 	}
 	else
-		absLocation = new Point(this.x, this.y);
+		absLocation = this.position.clone();
 	return absLocation;
 };
 
