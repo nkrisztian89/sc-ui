@@ -45,9 +45,6 @@ function ButtonIcon(game, key, settings) {
   }
 
   this.bg = new BackgroundView(game, this.settings.bg);
-  this.bg.inputEnabled = true;
-  this.bg.input.priorityID = 2;
-  this.bg.alpha = 0.75;
 
   // event handling
   this.bg.on('inputOver', this._inputOver, this);
@@ -68,6 +65,7 @@ ButtonIcon.prototype._inputUp = function() {
 
   this.bg.tint = 0xffffff;
   this.image.bg.tint = 0xffffff;
+
   this.emit('inputUp', this);
 };
 
@@ -76,6 +74,7 @@ ButtonIcon.prototype._inputDown = function() {
 
   this.bg.tint = 0xaaccee;
   this.image.bg.tint = 0xaaccee;
+
   this.emit('inputDown', this);
 };
 
