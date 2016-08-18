@@ -196,7 +196,7 @@ Panel.prototype.setLocation = function(xx, yy) {
 
 Panel.prototype.getAbsoluteLocation = function() {
 	var absLocation;
-	if(this.parent && this.parent.getAbsoluteLocation)
+	if(this.parent instanceof Panel)
 	{
 		absLocation = this.parent.getAbsoluteLocation();
 		absLocation.x += this.position.x;

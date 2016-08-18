@@ -84,7 +84,7 @@ Tooltip.prototype._inputOut = function() {
 Tooltip.prototype.attach = function() {
 	var root = this.component;
 	
-	while(root.parent && root.parent.addPanel)
+	while(root.parent instanceof Panel)
 		root = root.parent;
 	
 	this.raster = new Panel(this.game, new RasterLayout());
@@ -106,13 +106,12 @@ Tooltip.prototype.attach = function() {
 
 // repositions and redirects tooltip according to the new direction
 Tooltip.prototype.readjust = function(direction) {
-	var rasterPS = this.calcPreferredSize(),
-		loc;
+	var loc = Point.parse(this.component.getAbsoluteLocation());
 	this.settings.direction = direction;
 	this.arrowPanel.constraint = this.getLayoutConstraint(direction);
 	this.arrow.readjust(direction);
-	this.raster.setPreferredSize(rasterPS.width, rasterPS.height);
-	loc = this.calcLocation(direction);
+	this.position = this.calcLocation(direction);
+	loc.add(this.position.x, this.position.y);
 	this.setLocation(loc.x, loc.y);
 };
 
@@ -136,24 +135,18 @@ Tooltip.prototype.getLayoutConstraint = function(direction) {
 Tooltip.prototype.calcLocation = function(direction) {
 	var toolPS = this.getPreferredSize(),
 		compPS = this.component.getPreferredSize();
-		loc = Point.parse(this.component.getAbsoluteLocation());
 	switch(direction) {
 		case Tooltip.UP:
-			loc.add((compPS.width - toolPS.width)/2, compPS.height);
-			break;
+			return {x: (compPS.width - toolPS.width)/2, y: compPS.height};
 		case Tooltip.LEFT:
-			loc.add(compPS.width, (compPS.height - toolPS.height)/2);
-			break;
+			return {x: compPS.width, y: (compPS.height - toolPS.height)/2};
 		case Tooltip.DOWN:
-			loc.add((compPS.width - toolPS.width)/2, -toolPS.height);
-			break;
+			return {x: (compPS.width - toolPS.width)/2, y: -toolPS.height};
 		case Tooltip.RIGHT:
-			loc.add(-toolPS.width, (compPS.height - toolPS.height)/2);
-			break;
+			return {x: -toolPS.width, y: (compPS.height - toolPS.height)/2};
 		default:
 			throw new Error("Invalid Direction");
 	}
-	return loc;
 };
 
 // determines the correct size for the raster panel to fit inside its parent
