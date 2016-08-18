@@ -7,7 +7,7 @@ var engine = require('engine'),
 	RasterLayout = require('../layouts/RasterLayout'),
 	BackgroundView = require('../views/BackgroundView'),
 	ShapeView = require('../views/ShapeView'),
-	Point = engine.Point;
+	Point = engine.Point,
 	Class = engine.Class;
 
 /* Tooltip Prototype - creates a Tooltip */
@@ -43,8 +43,8 @@ function Tooltip(game, string, component, settings) {
 	this.setPadding.apply(this, this.settings.padding);
 	this.setBorder.apply(this, this.settings.border);
 	
+	this.component = component;
 	this.visible = false;
-	this.alpha = 1.0;
 	
 	this.message = new Label(game, string, this.settings.message);
 	
@@ -59,7 +59,9 @@ function Tooltip(game, string, component, settings) {
 	// build tooltip
 	this.addPanel(Layout.CENTER, this.message);
 	this.addPanel(Layout.CENTER, this.arrowPanel);
-	this.attachTo(component);
+	
+	// wait to attach
+	game.load.on('loadcomplete', this.attach, this);
 }
 
 Tooltip.prototype = Object.create(Panel.prototype);
@@ -79,9 +81,13 @@ Tooltip.prototype._inputOut = function() {
 };
 
 // adds tooltip to component
-Tooltip.prototype.attachTo = function(component) {
-	this.component = component;
-	this.raster = new Panel(game, new RasterLayout());
+Tooltip.prototype.attach = function() {
+	var root = this.component;
+	
+	while(root.parent && root.parent.addPanel)
+		root = root.parent;
+	
+	this.raster = new Panel(this.game, new RasterLayout());
 	
 	// event handling
 	if(!this.component.bg.inputEnabled) {
@@ -95,7 +101,7 @@ Tooltip.prototype.attachTo = function(component) {
 	
 	// add panels and place tooltip
 	this.raster.addPanel(Layout.NONE, this);
-	this.component.addPanel(Layout.NONE, this.raster);
+	root.addPanel(Layout.NONE, this.raster);
 }
 
 // repositions and redirects tooltip according to the new direction
@@ -129,20 +135,25 @@ Tooltip.prototype.getLayoutConstraint = function(direction) {
 // determines where the Tooltip should be located based on direction
 Tooltip.prototype.calcLocation = function(direction) {
 	var toolPS = this.getPreferredSize(),
-		rasterPS = this.raster.getPreferredSize(),
-		compPD = this.component.padding;
+		compPS = this.component.getPreferredSize();
+		loc = Point.parse(this.component.getAbsoluteLocation());
 	switch(direction) {
 		case Tooltip.UP:
-			return {x: (rasterPS.width - toolPS.width)/2, y: rasterPS.height + compPD.bottom};
+			loc.add((compPS.width - toolPS.width)/2, compPS.height);
+			break;
 		case Tooltip.LEFT:
-			return {x: rasterPS.width + compPD.right, y: (rasterPS.height - toolPS.height)/2};
+			loc.add(compPS.width, (compPS.height - toolPS.height)/2);
+			break;
 		case Tooltip.DOWN:
-			return {x: (rasterPS.width - toolPS.width)/2, y: -toolPS.height - compPD.top};
+			loc.add((compPS.width - toolPS.width)/2, -toolPS.height);
+			break;
 		case Tooltip.RIGHT:
-			return {x: -toolPS.width - compPD.left, y: (rasterPS.height - toolPS.height)/2};
+			loc.add(-toolPS.width, (compPS.height - toolPS.height)/2);
+			break;
 		default:
 			throw new Error("Invalid Direction");
 	}
+	return loc;
 };
 
 // determines the correct size for the raster panel to fit inside its parent
@@ -222,7 +233,7 @@ function Arrow(game, settings) {
 			fillAlpha: this.settings.sh.fillAlpha,
 			color: this.settings.sh.color
 		}
-	}
+	};
 	
 	this.back = new ShapeView(game, this.settings.back.sh);
 	this.front = new ShapeView(game, this.settings.front.sh);
