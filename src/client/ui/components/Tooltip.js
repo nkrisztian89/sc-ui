@@ -68,9 +68,6 @@ Tooltip.prototype = Object.create(Panel.prototype);
 Tooltip.prototype.constructor = Tooltip;
 
 Tooltip.prototype._inputOver = function() {
-	var direction = this.determineDirection();
-	if(direction !== this.settings.direction)
-		this.readjust(direction);
 	this.visible = true;
 	this.invalidate();
 };
@@ -99,20 +96,35 @@ Tooltip.prototype.attach = function() {
 	this.component.bg.on('inputOver', this._inputOver, this);
 	this.component.bg.on('inputOut', this._inputOut, this);
 	
+	this.component.tooltip = this;
+	this.component.repaint = function() {
+		Panel.prototype.repaint.call(this);
+		this.tooltip.update();
+	};
+	
 	// add panels and place tooltip
 	this.raster.addPanel(Layout.NONE, this);
 	root.addPanel(Layout.NONE, this.raster);
 }
 
-// repositions and redirects tooltip according to the new direction
+// updates the position and direction of tooltip
+Tooltip.prototype.update = function() {
+	var direction = this.determineDirection(),
+		loc = Point.parse(this.component.getAbsoluteLocation()),
+		pos;
+	if(direction !== this.settings.direction)
+		this.readjust(direction);
+	pos = this.calcLocation(direction);
+	loc.add(pos.x, pos.y);
+	this.setLocation(loc.x, loc.y);
+};
+
+// redirects tooltip according to the new direction
 Tooltip.prototype.readjust = function(direction) {
-	var loc = Point.parse(this.component.getAbsoluteLocation());
 	this.settings.direction = direction;
 	this.arrowPanel.constraint = this.getLayoutConstraint(direction);
 	this.arrow.readjust(direction);
-	this.position = this.calcLocation(direction);
-	loc.add(this.position.x, this.position.y);
-	this.setLocation(loc.x, loc.y);
+	this.arrow.repaint();
 };
 
 // returns the correct layout constraint based on the direction
