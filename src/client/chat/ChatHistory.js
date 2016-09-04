@@ -63,6 +63,15 @@ function ChatHistory(welcomeMessage, capacity) {
   this.flush = function() {
     this.trimTo(0);
   };
+  
+  /**
+   * Returns the current number of messages stored in this chat history.
+   * 
+   * @return The number of messages stored.
+   */
+  this.size = function() {
+    return Math.min(maxHistorySize, messages.length);
+  }
 }
 
 ChatHistory.prototype = Object.create(Object.prototype);
