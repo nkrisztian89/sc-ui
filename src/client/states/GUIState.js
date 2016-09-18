@@ -1,20 +1,23 @@
 
 var engine = require('engine'),
-    
+
     Panel = require('../ui/Panel'),
     Layout = require('../ui/Layout'),
 
     BorderLayout = require('../ui/layouts/BorderLayout'),
     FlowLayout = require('../ui/layouts/FlowLayout'),
     StackLayout = require('../ui/layouts/StackLayout'),
-    
+
     HeaderPane = require('../ui/panes/HeaderPane'),
     LeftPane = require('../ui/panes/LeftPane'),
-    RightPane = require('../ui/panes/RightPane'),
+    TopPane = require('../ui/panes/TopPane'), // renamed for clarity
     BottomPane = require('../ui/panes/BottomPane'),
     VitalsPane = require('../ui/panes/VitalsPane'),
     ShipPane = require('../ui/panes/ShipPane'),
-      
+
+    RightPane = require('../ui/panes/RightPane'),
+    Leaderboard = require('../ui/components/Leaderboard'),
+
     Alert = require('../ui/components/Alert'),
     AlertMessage = require('../ui/components/AlertMessage'),
     Modal = require('../ui/components/Modal'),
@@ -47,7 +50,15 @@ GUIState.prototype.preload = function() {
   this.game.load.image('deck', 'imgs/game/tilesets/deck-mini.png');
   this.game.load.image('wall', 'imgs/game/tilesets/wall-mini.png');
   this.game.load.image('grid', 'imgs/game/tilesets/grid-mini.png');
-    
+
+  // the placeholder image for players showing up in the leaderboard who have no specific image set (empty or generic image)
+  // this needs to be preloaded in any case
+  this.game.load.image('user-placeholder', 'imgs/game/icons/icon-x01.png');
+  // loading a sample image for text purposes
+  // if players can choose from a set of images then those can be loaded here (e.g. from a tileset)
+  // if uploading custom images is allowed, run-time asynchronous loading (with the placeholder showing until the actual image is loaded) needs to be implemented
+  this.game.load.image('user1', 'imgs/game/turrets/laser-a.png');
+
   // load ship tilemap
   this.game.load.tilemap('ship-tilemap', 'data/ship-mini.json');
 
@@ -78,9 +89,42 @@ GUIState.prototype.create = function() {
   this.centerPanel = new Panel(game, new BorderLayout(0, 0));
   this.basePanel = new Panel(game, new BorderLayout(0, 0));
   this.basePanel.setPadding(6);
-      
+  this.fullPanel = new Panel(game, new BorderLayout(0, 0)); // another panel stacked on top in stretch mode, which will house the leaderboard in the top-right corner
   this.leftPane = new LeftPane(game);
-  this.rightPane = new RightPane(game);
+
+  //..
+  // creating a list of sample "players" for testing the leaderboard
+  // I implemented the leaderboard in a way it expects user objects having
+  // name: string, kills: number and currency: number properties and optionally an imageKey: string property
+  // (I could not find the real structure of the user object)
+  // in production, the real user objects should be passed to it during run-time
+  var players = [{
+    name: 'laser joe',
+    kills: 25,
+    currency: 100,
+    imageKey: 'user1'
+  }, {
+    name: 'user-with-a-very-long-name',
+    kills: 2,
+    currency: 1,
+    imageKey: 'user1'
+  }, {
+    name: 'user without picture',
+    currency: 8,
+    kills: 10
+  }, {
+    name: 'loser Joe',
+    kills: 0,
+    currency: 0,
+    imageKey: 'user1'
+  }];
+
+  // the (new) right pane contains the leaderboard, we pass it the initial list of sample players for testing
+  this.rightPane = new RightPane(game, players);
+
+  // original the right pane renamed to top pane for clarity, as it contains UI elements visible in the top-center area
+  // we pass the leaderboard to it, as some test buttons were added to it invoking various leaderboard functionalities
+  this.topPane = new TopPane(game, this.rightPane.leaderboard);
   // this.bottomPane = new BottomPane(game);
   // this.vitalsPane = new VitalsPane(game);
 
@@ -101,8 +145,11 @@ GUIState.prototype.create = function() {
   //     }));
 
   this.topPanel = new Panel(game, new FlowLayout(Layout.CENTER, Layout.TOP, Layout.HORIZONTAL, 6));
-  this.topPanel.addPanel(Layout.NONE, this.rightPane);
+  this.topPanel.addPanel(Layout.NONE, this.topPane);
   this.topPanel.visible = false;
+
+  this.rightPanel = new Panel(game, new FlowLayout(Layout.CENTER, Layout.TOP, Layout.VERTICAL, 6));
+  this.rightPanel.addPanel(Layout.NONE, this.rightPane);
 
   // this.bottomPanel = new Panel(game, new FlowLayout(Layout.CENTER, Layout.TOP, Layout.VERTICAL, 3));
   // this.bottomPanel.addPanel(Layout.NONE, this.bottomPane);
@@ -112,9 +159,10 @@ GUIState.prototype.create = function() {
   // this.centerPanel.addPanel(Layout.CENTER, this.shipPanel);
   this.centerPanel.addPanel(Layout.LEFT, this.leftPane);
   // this.centerPanel.addPanel(Layout.RIGHT, this.targetPanel);
-  
+
   this.basePanel.addPanel(Layout.TOP, this.topPanel);
   // this.basePanel.addPanel(Layout.BOTTOM, this.bottomPanel);
+  this.fullPanel.addPanel(Layout.RIGHT, this.rightPanel);
 
   this.root = new Panel(game, new StackLayout());
   this.root.setSize(game.width, game.height);
@@ -125,6 +173,7 @@ GUIState.prototype.create = function() {
   this.root.addPanel(Layout.STRETCH, this.selection);
   this.root.addPanel(Layout.STRETCH, this.basePanel);
   this.root.addPanel(Layout.STRETCH, this.centerPanel);
+  this.root.addPanel(Layout.STRETCH, this.fullPanel);
   this.root.addPanel(Layout.STRETCH, this.modalComponent);
 
   // add root to stage
@@ -168,7 +217,7 @@ GUIState.prototype.refresh = function() {
 GUIState.prototype.toggle = function(force) {
   this.hud.visible = this.root.visible =
     force !== undefined ? force : !this.root.visible;
-  
+
   // repaint gui
   if(this.root.visible) {
     this.root.invalidate();

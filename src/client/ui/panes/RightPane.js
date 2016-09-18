@@ -1,114 +1,53 @@
 
 var engine = require('engine'),
     Layout = require('../Layout'),
-    Pane = require('../components/Pane'),
-    BorderPane = require('../components/BorderPane'),
-    Label = require('../components/Label'),
-    Image = require('../components/Image'),
-	ButtonIcon = require('../components/ButtonIcon'),
-	Tooltip = require('../components/Tooltip');
+    Leaderboard = require('../components/Leaderboard'),
+    Pane = require('../components/Pane');
 
-function RightPane(game, settings) {
+// this is a new a right pane, which houses the leaderboard
+// a list of sample players is passed to it for testing
+function RightPane(game, players) {
   Pane.call(this, game, {
-    width: 288,
-    height: 96,
-    padding: [0],
+    padding: [6],
     layout: {
-      ax: Layout.CENTER,
-      ay: Layout.TOP,
-      direction: Layout.VERTICAL,
-      gap: 0
+      gap: 6
     },
     bg: {
-      color: 0x336699,
-      fillAlpha: 0.2,
       fillAlpha: 0.0,
       borderSize: 0.0,
-      radius: 0
+      radius: 1
     }
   });
 
-  this.infoBorderPane = new BorderPane(game, {
-    padding: [0],
-    gap: [5, 0],
-    bg: {
-      fillAlpha: 0.0
-    }
-  });
+  // creating the leaderboard with options demonstrating customizability
+  this.leaderboard = new Leaderboard(game, {
+    maxEntries: 10, // number of players displayed
+    width: 260,
+    entryHeight: 30,
+    sortMode: Leaderboard.SORT_BY_KILLS,
+    maxNameLength: 18, // usernames longer than this will be truncated (using '...') in the leaderboard
+                       // has to be manually adjusted to fit the width (and expected length of kill / currency figures)
+                       // could be calculated from font size (though the added complexity might not worth it)
+    // background options for the displayed entries
+    // the leaderboard itself has no background because of a bug: hiding the last entry (with visible = false) and invalidating the leaderboard
+    // causes a wrong repaint, with the area of the last hidden entry being still painted until a new removal or addition (when the background updates
+    // to this last state, the new changes again not being visible) My guess is the bug is somewhere in the painting / layouting routines but I did not track it down
+    entryBg: {
+      color: 0x336699,
+      fillAlpha: 0.2,
+      borderSize: 0.0,
+      radius: 1
+    }});
 
-  this.infoBorderPane2 = new BorderPane(game, {
-    padding: [0],
-    gap: [5, 0],
-    bg: {
-      fillAlpha: 0.0
-    }
-  });
+  // adding the sample players for testing purposes
+  for (var i = 0; i < players.length; i++) {
+    this.leaderboard.addPlayer(players[i]);
+  }
 
-  this.fpsText = new Label(game,
-    '60 fps', {
-      padding: [0],
-      text: {
-        fontName: 'medium',
-        tint: 0x66aaff
-      },
-      bg: {
-        fillAlpha: 0.0,
-        borderAlpha: 0.0
-      }
-    });
-
-  this.pingText = new Label(game,
-    '0 ping', {
-      padding: [0],
-      text: {
-        fontName: 'medium',
-        tint: 0x66aaff
-      },
-      bg: {
-        fillAlpha: 0.0,
-        borderAlpha: 0.0
-      }
-    })
-
-  this.versionText = new Label(game,
-    'solar crusaders dev', {
-      padding: [5],
-      text: {
-        fontName: 'medium',
-        tint: 0x66aaff
-      },
-      bg: {
-        fillAlpha: 0.0,
-        borderAlpha: 0.0
-      }
-    });
-
-  // add layout panels
-  this.addPanel(Layout.CENTER, this.versionText);
-  
-  this.icon1 = new ButtonIcon(game, 'texture-atlas', { icon: { frame: 'icon-x01.png' }});
-  this.tooltip = new Tooltip(game, 'Button', this.icon1);
-
-  this.infoBorderPane2.addPanel(Layout.RIGHT, this.fpsText);
-  this.infoBorderPane2.addPanel(Layout.LEFT, this.pingText);
-  
-  this.addPanel(Layout.CENTER, this.infoBorderPane2);
-  this.addPanel(Layout.CENTER, this.icon1);
-  // create timer
-  game.clock.events.loop(500, this._updateInfo, this);
+  this.addPanel(Layout.NONE, this.leaderboard);
 };
 
 RightPane.prototype = Object.create(Pane.prototype);
 RightPane.prototype.constructor = RightPane;
-
-RightPane.prototype.validate = function() {
-  return Pane.prototype.validate.call(this);
-};
-
-RightPane.prototype._updateInfo = function() {
-  this.fpsText.text = this.game.clock.fps + ' fps';
-  this.pingText.text = this.game.net.rtt + ' rtt';
-  this.invalidate(true);
-};
 
 module.exports = RightPane;
